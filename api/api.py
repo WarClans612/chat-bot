@@ -7,7 +7,12 @@ app = Eve()
 
 @app.route('/hello')
 def hello_world():
-    return 'hello world!'
+    welcome = """
+    Welcome to the Academia Sinica Project's REST API Server
+    Please use the following route to access the features
+    /find : find keywords
+    """
+    return welcome
 
 @app.route('/find')
 def find_keywords():
