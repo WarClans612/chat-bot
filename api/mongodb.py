@@ -1,6 +1,7 @@
 import pymongo
 from classes import Keywords
 from pymongo import MongoClient
+from settings import *
 
 def Test():
     k = Keywords(['study'])
@@ -19,13 +20,13 @@ def Test():
     for keyword in keywords:
         print(keyword)
     del keywords[:]
-    delete_all_keywords(db)
-    drop_collection_keywords(db)
+    # delete_all_keywords(db)
+    # drop_collection_keywords(db)
     close_connection(client)
 
 def open_connection():
-    client = MongoClient('localhost', 27017)
-    db = client['academia']
+    client = MongoClient(MONGO_HOST, MONGO_PORT)
+    db = client[MONGO_DBNAME]
     return client, db
 
 def close_connection(client):
