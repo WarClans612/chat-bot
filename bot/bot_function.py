@@ -50,8 +50,10 @@ def qa_answering(sentence, answer_db, keyword_set_db):
                     found = 0
                 found += 1.0 / len(keyword_set_db[i])
                 scores[i] = found
-    index = max(scores, key=scores.get)
-    # value = max(scores, key=scores.get)
+    try:
+        index = max(scores, key=scores.get)
+    except:
+        index = 0
     return answer_db[index]
 
 if __name__ == '__main__':
