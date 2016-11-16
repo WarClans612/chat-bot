@@ -1,7 +1,9 @@
+#!/usr/bin/python
+
 import jieba
 import jieba.analyse
 
-"""QA存成array"""
+
 #question[] answer[] N
 file = open('QA_examples.txt', 'r')
 question = []
@@ -16,7 +18,7 @@ while data_Q:
 N=len(answer)
 file.close()
 
-"""建立keyword set"""
+
 #keyword_set[] num_of_keyword[]
 jieba.analyse.set_stop_words("extra_dict/stop_words.txt")
 jieba.analyse.set_idf_path("extra_dict/idf.txt.big");
@@ -30,7 +32,7 @@ for i in range(N):
     num_of_keyword.append(len(words))
     keywords.extend(words)
 	
-"""接收question 回answer"""
+
 sentence = input("-->")
 #words = jieba.cut(sentence, cut_all=False)
 words = jieba.analyse.extract_tags(sentence, topK=20, withWeight=False, allowPOS=())
