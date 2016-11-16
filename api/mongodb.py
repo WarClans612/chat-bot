@@ -1,7 +1,6 @@
 import pymongo
-from classes import Keywords
+from .classes import Keywords
 from pymongo import MongoClient
-from settings import *
 
 def Test():
     k = Keywords(['study'])

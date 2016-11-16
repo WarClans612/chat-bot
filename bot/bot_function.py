@@ -56,12 +56,12 @@ def qa_answering(sentence, answer_db, keyword_set_db):
 
 if __name__ == '__main__':
     ### Init QA from file
-    filename = 'QA_examples.txt'
+    filename = './QA_examples.txt'
     questions, answers = open_qa_file(filename)
 
     ### Initialize jieba
-    stop_words_filename = 'extra_dict/stop_words.txt'
-    idf_filename = 'extra_dict/idf.txt.big'
+    stop_words_filename = './extra_dict/stop_words.txt'
+    idf_filename = './extra_dict/idf.txt.big'
     keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, questions)
 
     ### Testing the module
