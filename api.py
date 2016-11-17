@@ -4,19 +4,20 @@ DEBUG = False
 from eve import Eve
 from flask import jsonify
 
+### Implemented using Python 3.5.2 (Anaconda 4.1.1) -- 64bit
 from api.mongodb import *
 from bot import bot_function as bot
-
 
 app = Eve()
 
 @app.route('/welcome')
+@app.route('/help')
 @app.route('/hello')
 def hello_world():
     welcome = """
-    Welcome to the Academia Sinica Project's REST API Server
-    Please use the following route to access the features
-    /qa/<question> : Asking question
+    Welcome to the Academia Sinica Project's REST API Server.\n
+    Please use the following route to access the features.\n
+    /qa/<question> : Asking question\n
     """
     # print(welcome)
     return welcome
@@ -30,13 +31,13 @@ def find_keywords():
 
 @app.route('/qa/<question>')
 def qa_handling(question):
-    answer = bot.qa_answering(question, answers, keyword_set)
-    return jsonify({'question':question, 'answer':answer})
+    answer, words, scores = bot.qa_answering(question, answers, keyword_set)
+    return jsonify({'question':question, 'answer':answer, 'keywords':words})
 
 if __name__ == '__main__':
     ### Init QA Engine
     global answers, keyword_set
-    filename = 'bot/QA_examples.txt'
+    filename = 'bot/QA.txt'
     questions, answers = bot.open_qa_file(filename)
     stop_words_filename = 'bot/extra_dict/stop_words.txt'
     idf_filename = 'bot/extra_dict/idf.txt.big'

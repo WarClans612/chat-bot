@@ -1,7 +1,9 @@
+### Implemented using Python 3.5.2 (Anaconda 4.1.1) -- 64bit
 #!/usr/bin/python
 
 import jieba
 import jieba.analyse
+from flask import jsonify
 
 topK = 20
 withWeight = False
@@ -54,11 +56,11 @@ def qa_answering(sentence, answer_db, keyword_set_db):
         index = max(scores, key=scores.get)
     except:
         index = 0
-    return answer_db[index]
+    return answer_db[index], words, scores
 
 if __name__ == '__main__':
     ### Init QA from file
-    filename = './QA_examples.txt'
+    filename = './QA.txt'
     questions, answers = open_qa_file(filename)
 
     ### Initialize jieba
@@ -67,9 +69,11 @@ if __name__ == '__main__':
     keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, questions)
 
     ### Testing the module
-    question = ['我想問課程抵免問題?', '我可以抵免計算機網路概論嗎?', '我想要問要幾分才可以抵免?']
+    question = ['正常人的血糖應該多少才正常?']
     for q in question:
         a = qa_answering(q, answers, keyword_set)
         print(q)
         print(a)
-        print()
+        print(q.encode('utf-8'))
+        print(a.encode('utf-8'))
+        print(a.encode('utf-8').decode('utf-8'))
