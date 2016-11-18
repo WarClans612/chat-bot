@@ -26,7 +26,7 @@ if __name__ == '__main__':
     conn = http.client.HTTPConnection(HOST, PORT)
     # request(conn, '/hello')
     pre = '/qa/'
-    # q = '正常人的血糖應該多少才正常?'
+    # qs = ['正常人的血糖應該多少才正常?']
     qs = ['正常人的血糖應該多少才正常?', '高血壓前期的血壓值是多少?', '你好']
     for q in qs:
         param = pre + q

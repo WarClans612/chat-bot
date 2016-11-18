@@ -1,11 +1,15 @@
+### Implemented using Python 3.5.2 (Anaconda 4.1.1) -- 64bit
 PORT = 25555
 DEBUG = False
 
-from eve import Eve
-from flask import jsonify
+from datetime import date, datetime
+import json
 
-### Implemented using Python 3.5.2 (Anaconda 4.1.1) -- 64bit
+from eve import Eve
+from flask import jsonify, request
+
 from api.mongodb import *
+from api.utilities import *
 from bot import bot_function as bot
 
 app = Eve()
@@ -32,7 +36,21 @@ def find_keywords():
 @app.route('/qa/<question>')
 def qa_handling(question):
     answer, words, scores = bot.qa_answering(question, answers, keyword_set)
-    return jsonify({'question':question, 'answer':answer, 'keywords':words})
+    ip = request.remote_addr
+    now = datetime.now()
+    output = json.dumps({'question':question, 'answer':answer, 'keywords':words, 'client':ip, 'time':now.timestamp()})
+    try:
+        result = bytes(output, 'utf-8')
+        result = result.decode('unicode-escape')
+        # print(result)
+        folder = './log/'
+        make_sure_path_exists(folder)
+        filename = 'qa_log_{}.txt'.format(date.today())
+        write_to_file(folder + filename, result)
+        # print('write to file: {}'.format(filename))
+    except Exception as ex:
+        print(str(ex))
+    return output
 
 if __name__ == '__main__':
     ### Init QA Engine
