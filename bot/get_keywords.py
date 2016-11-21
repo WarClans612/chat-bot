@@ -40,6 +40,23 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
 
 	return keywords, keyword_set, num_of_keyword
 	
+def qa_answering(sentence, answer_db, keyword_set_db):
+	scores = {}
+	words = jieba.analyse.extract_tags(sentence, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+	for word in words:
+		for i in range(len(keyword_set_db)):
+			if word in keyword_set_db[i]:
+				found = scores.get(i)
+				if found is None:
+					found = 0
+				found += 1.0 / len(keyword_set_db[i])
+				scores[i] = found
+	if len(scores) == 0:
+		return default_message
+	else:
+		index = max(scores, key=scores.get)
+		# value = max(scores, key=scores.get)
+		return answer_db[index]
 
 def qa_questoining(source, file_questioning):
 	questions = []
@@ -55,68 +72,23 @@ def qa_questoining(source, file_questioning):
 		print('error in qa_questoining : no such source!')
 	return questions
 	
-def qa_answering(sentence, answer_db, keyword_set_db):
-	scores = {}
-	words = jieba.analyse.extract_tags(sentence, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
-	match_keywords = []
-	for word in words:
-		for i in range(len(keyword_set_db)):
-			if word in keyword_set_db[i]:
-				match_keywords.append(word)
-				found = scores.get(i)
-				if found is None:
-					found = 0
-				found += 1.0 / len(keyword_set_db[i])
-				scores[i] = found
-	print ('keywords in questioning: '+'/'.join(words))
-	print ('keywords matched: '+'/'.join(match_keywords))
-	print ()
-	if len(scores) == 0:
-		return default_message
-	else:
-		index = max(scores, key=scores.get)
-		print (str(scores.get(index))+'%matched')
-		return answer_db[index]
+def keyword_set_recording(question_set, answer_set, keyword_set, file_recording):
+	with open(file_recording,'w',encoding='utf8') as fw:
+		for i in range(len(question_set)):
+			fw.write('Q: '+question_set[i]+'\n')
+			fw.write('K: '+'/'.join(keyword_set[i])+'\n')
+			fw.write('A: '+answer_set[i]+'\n\n')
 		
 if __name__ == '__main__':
 	### Init QA from file
-	filename = 'PM2.5QA.txt'
+	filename = '課程抵免QA.txt'
 	question_set, answer_set = open_qa_file(filename)
 
 	### Initialize jieba
 	stop_words_filename = 'extra_dict/stop_words.txt'
 	idf_filename = 'extra_dict/idf.txt.big'
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
-
-	### Testing the module
-	#questions = ['我想問課程抵免問題?', '我可以抵免計算機網路概論嗎?', '我想要問要幾分才可以抵免?']
-	#source from file
-	"""
-	source = 'file'
-	file_questioning = '課程_questions.txt'
-	questions = qa_questoining(source, file_questioning)
-	for q in questions:
-		a = qa_answering(q, answer_set, keyword_set)
-		print(q)
-		print(a)
-		print()
-	"""
-	#source from input
-	source = 'input'
-	file_questioning = ''
-	while 1==1:
-		questions = qa_questoining(source, file_questioning)
-		q = questions[0]
-		a = qa_answering(q, answer_set, keyword_set)
-		print('Q: '+q)
-		print('A: '+a)
-		print()
-	"""
-	#source from training set
-	questions = question_set
-	for q in questions:
-		a = qa_answering(q, answer_set, keyword_set)
-		print(q)
-		print(a)
-		print()
-	"""
+	
+	#keyword_set_recording
+	file_recording = '課程抵免.recording'
+	keyword_set_recording(question_set, answer_set, keyword_set, file_recording)
