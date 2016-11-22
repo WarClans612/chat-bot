@@ -80,7 +80,7 @@ def qa_answering(sentence, answer_db, keyword_set_db):
 		
 if __name__ == '__main__':
 	### Init QA from file
-	filename = 'PM2.5QA.txt'
+	filename = '課程抵免QA.txt'
 	question_set, answer_set = open_qa_file(filename)
 
 	### Initialize jieba
@@ -93,7 +93,7 @@ if __name__ == '__main__':
 	#source from file
 	"""
 	source = 'file'
-	file_questioning = '課程_questions.txt'
+	file_questioning = '課程抵免_questions.txt'
 	questions = qa_questoining(source, file_questioning)
 	for q in questions:
 		a = qa_answering(q, answer_set, keyword_set)
@@ -111,6 +111,7 @@ if __name__ == '__main__':
 		print('Q: '+q)
 		print('A: '+a)
 		print()
+	
 	"""
 	#source from training set
 	questions = question_set
