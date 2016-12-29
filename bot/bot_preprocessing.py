@@ -2,6 +2,9 @@
 
 import jieba
 import jieba.analyse
+from pymongo import MongoClient
+import math
+import bot_config
 
 topK = 20
 withWeight = False
@@ -78,50 +81,72 @@ def qa_answering(sentence, answer_db, keyword_set_db):
 		print (str(scores.get(index))+'%matched')
 		return answer_db[index]
 		
-def segment(question):
-	words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
-	return words
-		
 if __name__ == '__main__':
 	### Init QA from file
-	filename = '課程抵免QA.txt'
+	filename = bot_config.QAset
 	question_set, answer_set = open_qa_file(filename)
 
 	### Initialize jieba
 	stop_words_filename = 'extra_dict/stop_words.txt'
 	idf_filename = 'extra_dict/idf.txt.big'
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
-
-	### Testing the module
-	#questions = ['我想問課程抵免問題?', '我可以抵免計算機網路概論嗎?', '我想要問要幾分才可以抵免?']
-	#source from file
-	"""
-	source = 'file'
-	file_questioning = '課程抵免_questions.txt'
-	questions = qa_questoining(source, file_questioning)
-	for q in questions:
-		a = qa_answering(q, answer_set, keyword_set)
-		print(q)
-		print(a)
-		print()
-	"""
-	#source from input
-	source = 'input'
-	file_questioning = ''
-	while 1==1:
-		questions = qa_questoining(source, file_questioning)
-		q = questions[0]
-		a = qa_answering(q, answer_set, keyword_set)
-		print('Q: '+q)
-		print('A: '+a)
-		print()
 	
-	"""
-	#source from training set
-	questions = question_set
-	for q in questions:
-		a = qa_answering(q, answer_set, keyword_set)
-		print(q)
-		print(a)
-		print()
-	"""
+	###connect to DB:"bot"
+	db_url = bot_config.db_url 
+	db_name = bot_config.db_name
+	client = MongoClient(db_url)
+	db = client[db_name]
+	
+	### drop all tables to reset
+	db.drop_collection('QAKset')
+	db.drop_collection('keyword_data')
+	db.drop_collection('statistic_data')
+	
+	### Save into DB table:"QAKset"
+	collect = db['QAKset']
+
+	for i in range(len(question_set)):
+		data = {"question": question_set[i],
+				 "answer": answer_set[i],
+				 "keyword_list": keyword_set[i],
+				 "num_of_keyword": num_of_keyword[i]}
+		collect.insert_one(data)
+	
+	print("[QKAset]")	
+	for post in collect.find():
+		print (post)
+		
+	### Save into DB table:"keyword_data"
+	collect = db['keyword_data']
+	for i in range(len(keywords)):
+		data_k = { "keyword": keywords[i] }
+		data_f = { "$inc":{"frequency": 1} }
+		collect.update_one(data_k,data_f,upsert=True)
+	num_of_keywords = collect.count()
+	
+	for row in collect.find():
+		prob = row['frequency'] / len(question_set)
+		weight = 1 - prob
+		data_k = { "keyword": row['keyword'] }
+		data_new = { "$set" : { "prob": prob , "weight": weight} }
+		collect.update_one(data_k,data_new,upsert=True)
+		
+	print("[keyword_data]")
+	for post in collect.find():
+		print (post)
+		
+	### Save into DB table:"statistic_data"
+	collect = db['statistic_data']
+	data = {"name": "num_of_frequency",
+			"value": len(keywords)}
+	collect.insert_one(data)
+	data = {"name": "num_of_keywords",
+			"value": num_of_keywords}
+	collect.insert_one(data)
+	data = {"name": "num_of_questions",
+			"value": len(question_set)}
+	collect.insert_one(data)
+
+	print("[statistic_data]")
+	for post in collect.find():
+		print (post)
