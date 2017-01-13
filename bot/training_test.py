@@ -5,11 +5,12 @@ import bot_config
 import method 
 import sys
 
-#frequency ratio probability
+#frequency ratio weight
 
 filename = bot_config.QAset
-output_file = 'output.txt'
-weighting_method = 'probability'
+
+weighting_method = 'weight'
+output_file = 'output_{}.txt'.format(weighting_method)
 
 fail_count = 0
 success_count = 0

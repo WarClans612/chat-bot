@@ -30,7 +30,7 @@ def get_score(q_keywords, weighting_method):
 			for k in q_keywords:
 				if k in row_keyword_list:
 					scores[row['answer']] = scores[row['answer']] + (1/row_num_of_keyword)
-	elif weighting_method == 'probability':
+	elif weighting_method == 'weight':
 		for row in db.QAKset.find():
 			row_keyword_list = row['keyword_list']
 			for k in q_keywords:

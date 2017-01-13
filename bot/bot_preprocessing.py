@@ -126,7 +126,8 @@ if __name__ == '__main__':
 	
 	for row in collect.find():
 		prob = row['frequency'] / len(question_set)
-		weight = 1 - prob
+		tmp = 1 - prob
+		weight = math.exp(2*tmp)
 		data_k = { "keyword": row['keyword'] }
 		data_new = { "$set" : { "prob": prob , "weight": weight} }
 		collect.update_one(data_k,data_new,upsert=True)
