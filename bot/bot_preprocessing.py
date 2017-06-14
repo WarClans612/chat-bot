@@ -13,17 +13,53 @@ default_message = "找不到符合的答案"
 
 def open_qa_file(filename):
 	question_set = []
+	question_num_set = []
 	answer_set = []
+	answer_num_set = []
 	i = 0
+	flag_pre = 'N'
 	with open(filename, 'r', encoding='utf8') as fr:
 		for line in fr:
 			text = line.strip()
-			if i % 2 == 0:
-				question_set.append(text)
-			else:
-				answer_set.append(text)
-			i += 1
-	return question_set, answer_set
+			#"Q: question"
+			if text[0] == 'Q':
+				if flag_pre == 'A':
+					i += 1
+				question_set.append(text[3:])
+				question_num_set.append(i)
+				flag_pre = 'Q'
+			elif text[0] == 'A':
+				answer_set.append(text[3:])
+				answer_num_set.append(i)
+				flag_pre = 'A'
+			else :
+				print("[err in general_QAset: start not with Q: or A: ]")
+	return question_set, question_num_set, answer_set, answer_num_set
+
+def open_sensor_qa_file(filename):
+	question_set = []
+	question_num_set = []
+	answer_set = []
+	answer_num_set = []
+	i = 0
+	flag_pre = 'N'
+	with open(filename, 'r', encoding='utf8') as fr:
+		for line in fr:
+			text = line.strip()
+			#"Q: question"
+			if text[0] == 'Q':
+				if flag_pre == 'A':
+					i += 1
+				question_set.append(text[3:])
+				question_num_set.append(i)
+				flag_pre = 'Q'
+			elif text[0] == 'A':
+				answer_set.append(text[3:])
+				answer_num_set.append(i)
+				flag_pre = 'A'
+			else :
+				print("[err in sensor_QAset: start not with Q: or A: ]")
+	return question_set, question_num_set, answer_set, answer_num_set	
 
 def init_jieba(stop_words_filename, idf_filename, question_set):
 	jieba.analyse.set_stop_words(stop_words_filename)
@@ -43,53 +79,20 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
 
 	return keywords, keyword_set, num_of_keyword
 	
-
-def qa_questoining(source, file_questioning):
-	questions = []
-	if source=='input':
-		text = input("==>")
-		questions.append(text)
-	elif source=='file':
-		with open(file_questioning, 'r', encoding='utf8') as fr:
-			for line in fr:
-				text = line.strip()
-				questions.append(text)
-	else:
-		print('error in qa_questoining : no such source!')
-	return questions
-	
-def qa_answering(sentence, answer_db, keyword_set_db):
-	scores = {}
-	words = jieba.analyse.extract_tags(sentence, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
-	match_keywords = []
-	for word in words:
-		for i in range(len(keyword_set_db)):
-			if word in keyword_set_db[i]:
-				match_keywords.append(word)
-				found = scores.get(i)
-				if found is None:
-					found = 0
-				found += 1.0 / len(keyword_set_db[i])
-				scores[i] = found
-	print ('keywords in questioning: '+'/'.join(words))
-	print ('keywords matched: '+'/'.join(match_keywords))
-	print ()
-	if len(scores) == 0:
-		return default_message
-	else:
-		index = max(scores, key=scores.get)
-		print (str(scores.get(index))+'%matched')
-		return answer_db[index]
-		
 if __name__ == '__main__':
 	### Init QA from file
 	filename = bot_config.QAset
-	question_set, answer_set = open_qa_file(filename)
+	sensor_filename = bot_config.sensorQAset
+	question_set, question_num_set, answer_set, answer_num_set = open_qa_file(filename)
+	sensor_question_set, sensor_question_num_set, sensor_answer_set, sensor_answer_num_set = open_sensor_qa_file(sensor_filename)
 
 	### Initialize jieba
 	stop_words_filename = 'extra_dict/stop_words.txt'
 	idf_filename = 'extra_dict/idf.txt.big'
+	jieba.load_userdict("extra_dict/my_dict.txt")
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
+	sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
+	keywords.extend(sensor_keywords)
 	
 	###connect to DB:"bot"
 	db_url = bot_config.db_url 
@@ -98,21 +101,71 @@ if __name__ == '__main__':
 	db = client[db_name]
 	
 	### drop all tables to reset
-	db.drop_collection('QAKset')
+	db.drop_collection('question_table')
+	db.drop_collection('answer_table')
+	db.drop_collection('handle_table')
 	db.drop_collection('keyword_data')
 	db.drop_collection('statistic_data')
 	
-	### Save into DB table:"QAKset"
-	collect = db['QAKset']
-
+	### Save into DB table:"question_table"
+	collect = db['question_table']
+	
 	for i in range(len(question_set)):
 		data = {"question": question_set[i],
-				 "answer": answer_set[i],
-				 "keyword_list": keyword_set[i],
-				 "num_of_keyword": num_of_keyword[i]}
+				"question_num": question_num_set[i],
+				"keyword_list": keyword_set[i],
+				"num_of_keyword": num_of_keyword[i],
+				"handle_code": 0 
+				}
 		collect.insert_one(data)
+	sensor_start_num = question_num_set[len(question_num_set)-1] + 1
+	for i in range(len(sensor_question_set)):
+		data = {"question": sensor_question_set[i],
+				"question_num": sensor_start_num + sensor_question_num_set[i],
+				"keyword_list": sensor_keyword_set[i],
+				"num_of_keyword": sensor_num_of_keyword[i],
+				"handle_code": sensor_question_num_set[i] + 1 
+				}
+		collect.insert_one(data)
+	"""
+	data = {"question": "現在適合出門嗎?",
+			 "question_num": 0,
+			 #"answer": ["天氣和空氣品質都很好喔，很適合出門!","天氣不太好，不建議出門","空氣品質很差喔，不建議戶外活動"],
+			 "keyword_list": ["現在","適合","出門"],
+			 "num_of_keyword": 3,
+			 "handle_code": 0 
+			}
+	"""
+	print("[question_table]")	
+	for post in collect.find():
+		print (post)
 	
-	print("[QKAset]")	
+	### Save into DB table:"answer_table"
+	collect = db['answer_table']
+	for i in range(len(answer_set)):
+		data = {"question_num": answer_num_set[i],
+				"answer": answer_set[i]
+			}
+		collect.insert_one(data)
+	print("[answer_table]")
+	for post in collect.find():
+		print (post)
+	
+	### Save into DB table:"handle_table"
+	collect = db['handle_table']
+	flag_handle = 0
+	for i in range(len(sensor_answer_set)):
+		if flag_handle != (sensor_answer_num_set[i] + 1) :
+			flag_handle = sensor_answer_num_set[i] + 1
+			answer_code = 1
+		else:
+			answer_code += 1 
+		data = {"handle_code": sensor_answer_num_set[i] + 1,
+				"answer_code": answer_code,
+				"A_template": sensor_answer_set[i]
+			}
+		collect.insert_one(data)
+	print("[handle_table]")
 	for post in collect.find():
 		print (post)
 		
@@ -126,10 +179,10 @@ if __name__ == '__main__':
 	
 	for row in collect.find():
 		prob = row['frequency'] / len(question_set)
-		tmp = 1 - prob
-		weight = math.exp(2*tmp)
+		weight_prob = 1 - prob
+		weight_e = math.exp(2*weight_prob)
 		data_k = { "keyword": row['keyword'] }
-		data_new = { "$set" : { "prob": prob , "weight": weight} }
+		data_new = { "$set" : { "prob": prob , "weight_prob": weight_prob , "weight_e": weight_e} }
 		collect.update_one(data_k,data_new,upsert=True)
 		
 	print("[keyword_data]")

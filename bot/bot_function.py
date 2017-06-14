@@ -2,6 +2,9 @@
 
 import jieba
 import jieba.analyse
+from pymongo import MongoClient
+import bot_config
+import re
 
 topK = 20
 withWeight = False
@@ -82,6 +85,110 @@ def segment(question):
 	words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
 	return words
 		
+def sensor_handler(handle_code):
+	rain_bound = [20]
+	temperature_bound = [20,30]
+	air_quality_bound = [10,15,25,35]
+	temperature, rainfull_prob = get_weather()
+	air_quality = get_air_quality()
+	if handle_code == 1 :
+		if rainfull_prob < rain_bound[0]:
+			if temperature < temperature_bound[0]:
+				answer_code = 1
+			elif temperature < temperature_bound[1]:
+				answer_code = 2
+			else:
+				answer_code = 3
+		else:
+			if temperature < temperature_bound[0]:
+				answer_code = 4
+			elif temperature < temperature_bound[1]:
+				answer_code = 5
+			else:
+				answer_code = 6
+	elif handle_code == 2:
+		if rainfull_prob < rain_bound[0]:
+			answer_code = 1
+		else:
+			answer_code = 2
+	elif handle_code == 3:
+		if air_quality < air_quality_bound[0]:
+			answer_code = 1
+		elif air_quality < air_quality_bound[1]:
+			answer_code = 2
+		elif air_quality < air_quality_bound[2]:
+			answer_code = 3
+		else:
+			answer_code = 4
+	elif handle_code == 4:
+		if air_quality < air_quality_bound[1]:
+			if rainfull_prob < rain_bound[0]:
+				if temperature < temperature_bound[0]:
+					answer_code = 1
+				elif temperature < temperature_bound[1]:
+					answer_code = 2
+				else:
+					answer_code = 3
+			else:
+				if temperature < temperature_bound[0]:
+					answer_code = 4
+				elif temperature < temperature_bound[1]:
+					answer_code = 5
+				else:
+					answer_code = 6
+		else:
+			if rainfull_prob < rain_bound[0]:
+				if temperature < temperature_bound[0]:
+					answer_code = 7
+				elif temperature < temperature_bound[1]:
+					answer_code = 8
+				else:
+					answer_code = 9
+			else:
+				if temperature < temperature_bound[0]:
+					answer_code = 10
+				elif temperature < temperature_bound[1]:
+					answer_code = 11
+				else:
+					answer_code = 12
+	else: 
+		print("[err: no such handle_code]")
+		
+	###connect to DB:"bot"
+	db_url = bot_config.db_url 
+	db_name = bot_config.db_name
+	client = MongoClient(db_url)
+	db = client[db_name]
+	A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
+	replace_temperature = "#temperature#"
+	replace_rainfull_prob = "#rainfull_prob#"
+	answer = re.sub(replace_temperature, str(temperature), A_template)
+	answer = re.sub(replace_rainfull_prob, str(rainfull_prob), answer)
+	return answer
+	
+def get_answer(question_num):
+	###connect to DB:"bot"
+	db_url = bot_config.db_url 
+	db_name = bot_config.db_name
+	client = MongoClient(db_url)
+	db = client[db_name]
+	handle_code = db.question_table.find_one({'question_num':question_num})['handle_code']
+	
+	if handle_code == 0 : #general QA
+		answer = db.answer_table.find_one({'question_num':question_num})['answer']
+	else : #sensor related QA
+		answer = sensor_handler(handle_code)
+	return answer
+
+def get_weather():
+	temperature = 30
+	rainfull_prob = 50
+	return temperature, rainfull_prob
+	
+def get_air_quality():
+	air_quality = 18
+	return air_quality
+	
 if __name__ == '__main__':
 	### Init QA from file
 	filename = '課程抵免QA.txt'

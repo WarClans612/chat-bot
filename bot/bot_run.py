@@ -5,8 +5,8 @@ import method
 import sys
 
 if len(sys.argv) < 2: #len小於2也就是不帶參數啦
-	print("no argument, using [probability] for default")
-	weighting_method = 'probability'
+	print("no argument, using [fre_prob] for default")
+	weighting_method = 'fre_prob'
 elif sys.argv[1].startswith('-'):
 	option = sys.argv[1][1:] # 取出sys.argv[1]的數值但是忽略掉'--'這兩個字元
 	if option == 'w': 
@@ -20,6 +20,8 @@ else:
 while 1==1:
 	question = input("==>")
 	words = bot.segment(question)
+	print(words)
 	scores_sorted = method.get_score(words, weighting_method)
-	answer = scores_sorted[0]
+	question_num = scores_sorted[0][0]
+	answer = bot.get_answer(question_num)
 	print (answer)
