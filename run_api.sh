@@ -1,1 +1,1 @@
-python api/acadeamia_api.py
+python api/academia_api.py
