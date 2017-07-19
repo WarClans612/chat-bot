@@ -1,9 +1,9 @@
 PORT = 25555
 DEBUG = False
 
-from eve import Eve
+from flask import Flask
 from mongodb import *
-app = Eve()
+app = Flask(__name__)
 
 @app.route('/hello')
 def hello_world():
