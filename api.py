@@ -13,7 +13,9 @@ from api.utilities import *
 from bot import bot_function as bot
 
 app = Eve()
+FOLDER = '/mnt/50C6F7D9C6F7BD72/@Experiments/academia/'
 
+@app.route('/')
 @app.route('/welcome')
 @app.route('/help')
 @app.route('/hello')
@@ -43,7 +45,7 @@ def qa_handling(question):
         result = bytes(output, 'utf-8')
         result = result.decode('unicode-escape')
         # print(result)
-        folder = './log/'
+        folder = FOLDER + '/log/'
         make_sure_path_exists(folder)
         filename = 'qa_log_{}.txt'.format(date.today())
         write_to_file(folder + filename, result)
@@ -55,10 +57,10 @@ def qa_handling(question):
 if __name__ == '__main__':
     ### Init QA Engine
     global answers, keyword_set
-    filename = 'bot/QA.txt'
+    filename = FOLDER + '/bot/QA.txt'
     questions, answers = bot.open_qa_file(filename)
-    stop_words_filename = 'bot/extra_dict/stop_words.txt'
-    idf_filename = 'bot/extra_dict/idf.txt.big'
+    stop_words_filename = FOLDER + '/bot/extra_dict/stop_words.txt'
+    idf_filename = FOLDER + '/bot/extra_dict/idf.txt.big'
     keywords, keyword_set, num_of_keyword = bot.init_jieba(stop_words_filename, idf_filename, questions)
 
     ### Eve webserver
