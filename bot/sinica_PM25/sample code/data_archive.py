@@ -59,7 +59,7 @@ def start_download_data(year, month, day):
     	#  2. DO NOT REMOVE THE "ALLOW FILTERING" OPTION!
     	# ------------------------------
     	# query for 1 month's data:
-    	Command = "SELECT data FROM " + Cassandra_ARCHIVE +  ".all WHERE source='" + SOURCE + "' and year=" + str( int(YEAR) ) + " and month=" + str( int( MONTH ) ) + " ALLOW FILTERING;"
+    	Command = "SELECT data FROM " + Cassandra_ARCHIVE +  ".all WHERE source='" + SOURCE + "' and year=" + str( int(year) ) + " and month=" + str( int( month ) )  + " and day=" + str( int( day ) ) + " ALLOW FILTERING;"
     	# query for a date (ex. 2017-02-01):
     	# Command = "SELECT data FROM " + Cassandra_ARCHIVE +  ".all WHERE source='" + SOURCE + "' and year=" + str( YEAR ) + " and month=" + str( int( MONTH ) ) + " and day=" + str( int( DAY ) ) + " ALLOW FILTERING;"
     	statement = SimpleStatement( Command, consistency_level = Cassandra_CONSISTLEVEL, fetch_size = Cassandra_FETCH_SIZE )
@@ -68,8 +68,8 @@ def start_download_data(year, month, day):
     		# start archiving the data to the local database here!
     		# ############################################################
     		for result in casssession.execute( statement, timeout = Cassandra_TIMEOUT ):
-    			record = str( result.data ).replace( '\n', '' ).replace( '\r', '' ).encode( 'utf-8' )
-    			#print( record )
+    			record = str( result.data ).replace( '\n', '' ).replace( '\r', '' )#.encode( 'utf-8' )
+    			print( record )
     			
     			##### your code here... #####
     			
@@ -81,7 +81,7 @@ def start_download_data(year, month, day):
     		#for item in data:
     			#thefile.write("%s\n" % item)
     
-    		with open(os.path.join(os.getcwd(),"data","pm25_epa_"+year+month+day+'.txt'), "w") as output:
+    		with open(os.path.join(os.getcwd(),"data","pm25_epa_"+year+month+day+'.txt'), "w" ) as output:
     			output.write(str(data))
     
       
@@ -107,3 +107,11 @@ def start_download_data(year, month, day):
     
     # close the database connections
     casscluster.shutdown()
+	
+if __name__ == '__main__':
+	year = '2017'
+	month = '06'
+	day = '3'
+	start_download_data(year, month, day)
+	
+	

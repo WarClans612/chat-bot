@@ -5,6 +5,11 @@ import jieba.analyse
 from pymongo import MongoClient
 import bot_config
 import re
+import WeatherAPI.weather as weather
+import my_pm25 as pm25
+from datetime import datetime #datetime.datetime
+import urllib.request
+import urllib.parse
 
 topK = 20
 withWeight = False
@@ -82,15 +87,21 @@ def qa_answering(sentence, answer_db, keyword_set_db):
 		return answer_db[index]
 		
 def segment(question):
-	words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+	#words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+	urll = 'http://127.0.0.1:25555/segmentation/'
+	target_url = urllib.request.Request(urll+ urllib.parse.quote(question.strip(), safe=''))
+	fp = urllib.request.urlopen(target_url)
+	data_list = fp.read().decode('utf-8')
+	fp.close()
+	words = data_list.split("/")
 	return words
 		
-def sensor_handler(handle_code):
+def sensor_handler(handle_code,slots):
 	rain_bound = [20]
 	temperature_bound = [20,30]
 	air_quality_bound = [10,15,25,35]
-	temperature, rainfull_prob = get_weather()
-	air_quality = get_air_quality()
+	temperature, rainfull_prob = get_weather(slots)
+	air_quality = get_air_quality(slots)
 	if handle_code == 1 :
 		if rainfull_prob < rain_bound[0]:
 			if temperature < temperature_bound[0]:
@@ -166,7 +177,7 @@ def sensor_handler(handle_code):
 	answer = re.sub(replace_rainfull_prob, str(rainfull_prob), answer)
 	return answer
 	
-def get_answer(question_num):
+def get_answer(question_num,slots):
 	###connect to DB:"bot"
 	db_url = bot_config.db_url 
 	db_name = bot_config.db_name
@@ -177,17 +188,60 @@ def get_answer(question_num):
 	if handle_code == 0 : #general QA
 		answer = db.answer_table.find_one({'question_num':question_num})['answer']
 	else : #sensor related QA
-		answer = sensor_handler(handle_code)
+		answer = sensor_handler(handle_code,slots)
 	return answer
 
-def get_weather():
-	temperature = 30
-	rainfull_prob = 50
+def get_weather(slots):
+	#temperature = 30
+	#rainfull_prob = 50
+	if "space" not in slots:
+		slots["space"] = "新竹市"
+	if "time" not in slots:
+		slots["time"] = "now"
+	data_list = weather.grab_data(Data_set = "F-C0032-001",Location_name = slots["space"])
+	if slots["time"] == "now":
+		for t in data_list[slots["space"]]:
+			#time = datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+			if datetime.now() > t:
+				temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
+				rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
+				break
+		for t in data_list[slots["space"]]:
+			temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
+			rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
+			break
+	else :
+		for t in data_list[slots["space"]]:
+			#time = datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
+			if datetime.now().date() < t.date():
+				temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
+				rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
+				break
 	return temperature, rainfull_prob
 	
-def get_air_quality():
-	air_quality = 18
-	return air_quality
+def get_air_quality(slots):
+	#air_quality = 18
+	air_quality = pm25.get_pm25(slots["space"])
+	return int(air_quality)
+	
+def get_slots(words):
+	slots = {}
+	country_name = ['宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣', '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市', '基隆市', '新竹縣', '新竹市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '嘉義縣', '嘉義市', '屏東縣']
+	country_nickname = ['宜蘭', '花蓮', '臺東', '台東', '台東縣', '澎湖', '金門', '連江', '臺北', '台北', '台北市', '新北', '桃園', '臺中', '台中', '台中市', '臺南', '台南', '台南市', '高雄', '基隆', '新竹', '苗栗', '彰化', '南投', '雲林', '嘉義', '屏東', '馬祖']
+	mapping = {'屏東': '屏東縣', '台北': '臺北市', '馬祖': '連江', '臺東': '臺東縣', '金門': '金門縣', '新竹': '新竹縣', '台北市': '臺北市', '花蓮': '花蓮縣', '台南': '臺南市', '台東': '臺東縣', '雲林': '雲林縣', '苗栗': '苗栗縣', '桃園': '桃園市', '台中': '臺中市', '宜蘭': '宜蘭縣', '臺中': '臺中市', '彰化': '彰化縣', '台東縣': '臺東縣', '新北': '新北市', '臺南': '臺南市', '嘉義': '嘉義縣', '南投': '南投縣', '台中市': '臺中市', '連江': '連江縣', '臺北': '臺北市', '基隆': '基隆市', '台南市': '臺南市', '澎湖': '澎湖縣', '高雄': '高雄市'}
+	time_name = ['今天','現在','明天']
+	for i in words:
+		if i in country_name:
+			slots["space"] = i
+		if i in country_nickname:
+			slots["space"] = mapping[i]
+	for i in words:
+		if i in time_name:
+			if i in ['今天','現在']:
+				slots['time'] = 'now'
+			elif i in ['明天']:
+				slots['time'] = 'next'
+	return slots
 	
 if __name__ == '__main__':
 	### Init QA from file

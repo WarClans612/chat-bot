@@ -1,0 +1,28 @@
+[
+	b'{
+		"ver_format":3,
+		"fmt_opt":1,
+		"app":"EPA_COPY",
+		"date":"2017-02-12",
+		"time":"23:00:00",
+		"Status":"\xe8\x89\xaf\xe5\xa5\xbd",
+		"PSI":47,
+		"CO":0.43,
+		"SiteEngName":"Douliu",
+		"PM10":27,
+		"NO":4.93,
+		"SiteName":"\xe6\x96\x97\xe5\x85\xad",
+		"FPMI":3,
+		"WindDirec":97,
+		"PM2_5":28,
+		"PublishTime":"2017-02-13 07:00",
+		"County":"\xe9\x9b\xb2\xe6\x9e\x97\xe7\xb8\xa3",
+		"WindSpeed":0.5,
+		"SO2":1,
+		"NOx":26.26,
+		"SiteType":"\xe4\xb8\x80\xe8\x88\xac\xe6\xb8\xac\xe7\xab\x99",
+		"O3":4.6,
+		"NO2":21,
+		"loc":{"type":"Point","coordinates":[23.711853,120.544994]}
+	}',
+b'{"ver_format":3,"fmt_opt":1,"app":"EPA_COPY","date":"2017-02-24","time":"00:00:00","PSI":0,"CO":0.45,"SiteEngName":"Taixi","NO":1.46,"SiteName":"\xe8\x87\xba\xe8\xa5\xbf","FPMI":3,"WindDirec":38,"PM2_5":24,"PublishTime":"2017-02-24 08:00","County":"\xe9\x9b\xb2\xe6\x9e\x97\xe7\xb8\xa3","WindSpeed":6.4,"SO2":4.6,"NOx":14.09,"SiteType":"\xe5\xb7\xa5\xe6\xa5\xad\xe6\xb8\xac\xe7\xab\x99","O3":27,"NO2":13,"loc":{"type":"Point","coordinates":[23.717533,120.202842]}}', b'{"ver_format":3,"fmt_opt":1,"app":"EPA_COPY","date":"2017-02-01","time":"03:00:00","Status":"\xe8\x89\xaf\xe5\xa5\xbd","PSI":31,"CO":0.25,"SiteEngName":"Puli","PM10":22,"NO":2.53,"SiteName":"\xe5\x9f\x94\xe9\x87\x8c","FPMI":2,"WindDirec":163,"PM2_5":12,"PublishTime":"2017-02-01 11:00","County":"\xe5\x8d\x97\xe6\x8a\x95\xe7\xb8\xa3","WindSpeed":1.8,"SO2":1.7,"NOx":9.26,"SiteType":"\xe5\x85\xb6\xe5\xae\x83\xe6\xb8\xac\xe7\xab\x99","O3":25,"NO2":6.7,"loc":{"type":"Point","coordinates":[23.968842,120.967903]}}', b'{"ver_format":3,"fmt_opt":1,"app":"EPA_COPY","date":"2017-02-06","time":"16:00:00","Status":"\xe6\x99\xae\xe9\x80\x9a","PSI":67,"CO":0.41,"SiteEngName":"Changhua","PM10":74,"NO":".88","SiteName":"\xe5\xbd\xb0\xe5\x8c\x96","FPMI":6,"WindDirec":46,"PM2_5":46,"PublishTime":"2017-02-07 00:00","County":"\xe5\xbd\xb0\xe5\x8c\x96\xe7\xb8\xa3","MajorPollutant":"\xe6\x87\xb8\xe6\xb5\xae\xe5\xbe\xae\xe7\xb2\x92","WindSpeed":2.9,"SO2":1.8,"NOx":12.73,"SiteType":"\xe4\xb8\x80\xe8\x88\xac\xe6\xb8\xac\xe7\xab\x99","O3":33,"NO2":12,"loc":{"type":"Point","coordinates":[24.066,120.541519]}}]

@@ -22,6 +22,7 @@ while 1==1:
 	words = bot.segment(question)
 	print(words)
 	scores_sorted = method.get_score(words, weighting_method)
+	slots = bot.get_slots(words)
 	question_num = scores_sorted[0][0]
-	answer = bot.get_answer(question_num)
+	answer = bot.get_answer(question_num,slots)
 	print (answer)

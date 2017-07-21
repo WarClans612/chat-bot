@@ -1,0 +1,24 @@
+[
+	{
+		"ver_format":3,
+		"fmt_opt":1,
+		"app":"EPA_COPY",
+		"date":"2017-02-12",
+		"time":"23:00:00",
+		"PSI":47,
+		"CO":0.43,
+		"SiteEngName":"Douliu",
+		"PM10":27,
+		"NO":4.93,
+		"FPMI":3,
+		"WindDirec":97,
+		"PM2_5":28,
+		"PublishTime":"2017-02-13 07:00",
+		"WindSpeed":0.5,
+		"SO2":1,
+		"NOx":26.26,
+		"O3":4.6,
+		"NO2":21,
+		"loc":{"type":"Point","coordinates":[23.711853,120.544994]}
+	}
+]
