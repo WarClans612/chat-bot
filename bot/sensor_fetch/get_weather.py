@@ -6,6 +6,8 @@ import json
 import os
 from datetime import datetime #datetime.datetime
 
+from sensor_config import weather_token
+
 def parse_json_data(pure_data):
 	location = pure_data['records']['location']
 	Location_list = {}
@@ -34,9 +36,7 @@ def grab_data(Data_set,Location_name):
 	else:
 		target_url = urllib.request.Request(urll+ urllib.parse.quote(Location_name, safe='')+'sort=time')
 
-	with open("token.txt","r") as token_file:
-		token = token_file.readline().rstrip('\n')
-	target_url.add_header( 'Authorization' , token)
+	target_url.add_header( 'Authorization' , weather_token)
 	fp = urllib.request.urlopen(target_url)
 	pure_data = json.loads(fp.read().decode('utf-8'))
 	fp.close()

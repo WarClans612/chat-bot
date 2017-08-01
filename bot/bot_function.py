@@ -3,10 +3,13 @@
 import jieba
 import jieba.analyse
 from pymongo import MongoClient
+import sys
 import bot_config
 import re
-import WeatherAPI.weather as weather
-import my_pm25 as pm25
+#import WeatherAPI.weather as weather
+#import my_pm25 as pm25
+from sensor_fetch import get_pm25 as pm25
+from sensor_fetch import get_weather as weather
 from datetime import datetime #datetime.datetime
 import urllib.request
 import urllib.parse
@@ -86,9 +89,10 @@ def qa_answering(sentence, answer_db, keyword_set_db):
 		print (str(scores.get(index))+'%matched')
 		return answer_db[index]
 		
+		
 def segment(question):
 	#words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
-	urll = 'http://127.0.0.1:25555/segmentation/'
+	urll = bot_config.segment_api_url
 	target_url = urllib.request.Request(urll+ urllib.parse.quote(question.strip(), safe=''))
 	fp = urllib.request.urlopen(target_url)
 	data_list = fp.read().decode('utf-8')
@@ -222,13 +226,13 @@ def get_weather(slots):
 def get_air_quality(slots):
 	#air_quality = 18
 	air_quality = pm25.get_pm25(slots["space"])
-	return int(air_quality)
+	return float(air_quality)
 	
 def get_slots(words):
 	slots = {}
 	country_name = ['宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣', '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市', '基隆市', '新竹縣', '新竹市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '嘉義縣', '嘉義市', '屏東縣']
 	country_nickname = ['宜蘭', '花蓮', '臺東', '台東', '台東縣', '澎湖', '金門', '連江', '臺北', '台北', '台北市', '新北', '桃園', '臺中', '台中', '台中市', '臺南', '台南', '台南市', '高雄', '基隆', '新竹', '苗栗', '彰化', '南投', '雲林', '嘉義', '屏東', '馬祖']
-	mapping = {'屏東': '屏東縣', '台北': '臺北市', '馬祖': '連江', '臺東': '臺東縣', '金門': '金門縣', '新竹': '新竹縣', '台北市': '臺北市', '花蓮': '花蓮縣', '台南': '臺南市', '台東': '臺東縣', '雲林': '雲林縣', '苗栗': '苗栗縣', '桃園': '桃園市', '台中': '臺中市', '宜蘭': '宜蘭縣', '臺中': '臺中市', '彰化': '彰化縣', '台東縣': '臺東縣', '新北': '新北市', '臺南': '臺南市', '嘉義': '嘉義縣', '南投': '南投縣', '台中市': '臺中市', '連江': '連江縣', '臺北': '臺北市', '基隆': '基隆市', '台南市': '臺南市', '澎湖': '澎湖縣', '高雄': '高雄市'}
+	mapping = {'台東縣': '臺東縣', '基隆': '基隆市', '臺南': '臺南市', '新北': '新北市', '台北市': '臺北市', '台中': '臺中市', '馬祖': '連江', '台中市': '臺中市', '台南市': '臺南市', '台北': '臺北市', '金門': '金門縣', '澎湖': '澎湖縣', '台東': '臺東縣', '桃園': '桃園市', '苗栗': '苗栗縣', '臺東': '臺東縣', '臺北': '臺北市', '臺中': '臺中市', '連江': '連江縣', '屏東': '屏東縣', '彰化': '彰化縣', '新竹': '新竹市', '花蓮': '花蓮縣', '高雄': '高雄市', '嘉義': '嘉義市', '南投': '南投縣', '宜蘭': '宜蘭縣', '台南': '臺南市', '雲林': '雲林縣'}
 	time_name = ['今天','現在','明天']
 	for i in words:
 		if i in country_name:

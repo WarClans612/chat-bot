@@ -15,7 +15,8 @@ def get_pm25(Location_name):
 	data_list = grab_data()
 	for data in data_list:
 		if data["County"] == Location_name:
-			return data["PM2.5"]
+			if data["PM2.5"] != '':
+				return data["PM2.5"]
 	
 if __name__ == "__main__":
 	pm25 = get_pm25("新竹市")
