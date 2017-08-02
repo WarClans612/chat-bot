@@ -12,7 +12,7 @@ import bot_config
 # 'fre_prob'
 # 'combination'
 
-def get_score(q_keywords, weighting_method):
+def get_score(q_keywords, weighting_method): ### "prob" contains some question
 	###connect to DB:"bot"
 	db_url = bot_config.db_url 
 	db_name = bot_config.db_name
@@ -92,7 +92,101 @@ def get_score(q_keywords, weighting_method):
 	scores_sorted = sorted(scores.items(),key = operator.itemgetter(1),reverse = True)
 	return scores_sorted
 #return schema : [('bb', 4), ('aa', 3), ('cc', 2), ('dd', 1)]
+
+def integrateQA(q_keywords):
+	N = len(q_keywords)
+	
+	### connect to DB:"bot" ###
+	db_url = bot_config.db_url 
+	db_name = bot_config.db_name
+	client = MongoClient(db_url)
+	db = client[db_name]
+	
+	scores_fre_general = {}
+	scores_fre_sensor = {}
+	pass_general_list = []
+	pass_sensor_list = []
+	
+	for row in db.question_table.find({'type': "general"}):
+		scores_fre_general[row['question_num']] = 0
+		row_keyword_list = row['keyword_list']
+		for k in q_keywords:
+			if k in row_keyword_list:
+				scores_fre_general[row['question_num']] = scores_fre_general[row['question_num']] +1
+	for row in db.question_table.find({'type': "general"}):
+		tmp_prob = scores_fre_general[row['question_num']] / row['num_of_keyword']
+		if tmp_prob > 0.6:
+			pass_general_list.append(row['question_num'])
+	
+	for row in db.question_table.find({'type': "sensor"}):
+		scores_fre_sensor[row['question_num']] = 0
+		row_keyword_list = row['keyword_list']
+		for k in q_keywords:
+			if k in row_keyword_list:
+				scores_fre_sensor[row['question_num']] = scores_fre_sensor[row['question_num']] +1
+	for row in db.question_table.find({'type': "sensor"}):
+		tmp_prob = scores_fre_sensor[row['question_num']] / row['num_of_keyword']
+		if tmp_prob == 1 :
+			pass_sensor_list.append(row['question_num'])
+	
+	
+	
+	if len(pass_general_list)!= 0 :
+		general_most_fre = scores_fre_general[pass_general_list[0]]
+		general_most_qnum = pass_general_list[0]
+		for i in pass_general_list:
+			tmp_fre = scores_fre_general[i]
+			if tmp_fre > general_most_fre:
+				general_most_fre = tmp_fre
+				general_most_qnum = i
+				
+	if len(pass_sensor_list)!= 0 :
+		sensor_most_fre = scores_fre_sensor[pass_sensor_list[0]]
+		sensor_most_qnum = pass_sensor_list[0]
+		for i in pass_sensor_list:
+			tmp_fre = scores_fre_sensor[i]
+			if tmp_fre > sensor_most_fre:
+				sensor_most_fre = tmp_fre
+				sensor_most_qnum = i
+	
+	
+	
+	if len(pass_general_list)!=0 and len(pass_sensor_list)!= 0:
+		if sensor_most_fre>=general_most_fre:
+			type = "sQA"
+		else:
+			type = "gQA"
+	elif len(pass_general_list)==0 and len(pass_sensor_list)!= 0:
+		type = "sQA"
+	elif len(pass_general_list)!=0 and len(pass_sensor_list)== 0:
+		if (general_most_fre / N) > 0.6:
+			type = "gQA"
+		else:
+			type = "neither"
+	else: 
+		type = "neither"
+	
+	result = {}
+	if type == "sQA":
+		result["type"] = type
+		result["q_num"] = sensor_most_qnum
+	elif type == "gQA":
+		result["type"] = type
+		result["q_num"] = general_most_qnum
+	else:
+		result["type"] = type
+		
+	return result
+	
+
 if __name__ == '__main__':
-	scores_sorted = get_score('天氣', 'probability')
-	top_question_num = scores_sorted[0]
-	print(top_question_num[0])
+	### test get_score ###
+	# scores_sorted = get_score('天氣', 'probability')
+	# top_question_num = scores_sorted[0]
+	# print(top_question_num[0])
+	
+	
+	### test integrateQA ###
+	question = ["今天","天氣"]
+	result = integrateQA(question)
+	print(result)

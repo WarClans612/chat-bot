@@ -89,7 +89,9 @@ if __name__ == '__main__':
 	### Initialize jieba
 	stop_words_filename = 'extra_dict/stop_words.txt'
 	idf_filename = 'extra_dict/idf.txt.big'
+	jieba.set_dictionary('extra_dict/zh-tw_dict.txt')
 	jieba.load_userdict("extra_dict/my_dict.txt")
+	jieba.load_userdict("extra_dict/location_dict.txt")
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
 	sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
 	keywords.extend(sensor_keywords)
@@ -115,7 +117,8 @@ if __name__ == '__main__':
 				"question_num": question_num_set[i],
 				"keyword_list": keyword_set[i],
 				"num_of_keyword": num_of_keyword[i],
-				"handle_code": 0 
+				"handle_code": 0,
+				"type": "general"
 				}
 		collect.insert_one(data)
 	sensor_start_num = question_num_set[len(question_num_set)-1] + 1
@@ -124,7 +127,8 @@ if __name__ == '__main__':
 				"question_num": sensor_start_num + sensor_question_num_set[i],
 				"keyword_list": sensor_keyword_set[i],
 				"num_of_keyword": sensor_num_of_keyword[i],
-				"handle_code": sensor_question_num_set[i] + 1 
+				"handle_code": sensor_question_num_set[i] + 1 ,
+				"type": "sensor"
 				}
 		collect.insert_one(data)
 	"""
