@@ -15,6 +15,7 @@ A: 氣溫#temperature#度，有點冷喔，而且有#rainfull_prob#%機率下雨
 A: 氣溫#temperature#度，溫度適中，但有#rainfull_prob#%機率下雨，外出記得攜帶雨具喔!
 A: 氣溫#temperature#度，比較炎熱，而且有#rainfull_prob#%機率下雨，請多多補充水份，外出記得攜帶雨具!
 Q: 會下雨嗎?
+Q: 下雨機率?
 A: 降雨機率#rainfull_prob#%。
 A: 降雨機率#rainfull_prob#%，有很大機率降雨，外出請記得攜帶雨具喔!
 Q: 空氣品質好嗎?

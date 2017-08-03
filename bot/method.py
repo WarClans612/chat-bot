@@ -108,46 +108,44 @@ def integrateQA(q_keywords):
 	pass_sensor_list = []
 	
 	for row in db.question_table.find({'type': "general"}):
-		scores_fre_general[row['question_num']] = 0
+		scores_fre_general[row['question']] = 0
 		row_keyword_list = row['keyword_list']
 		for k in q_keywords:
 			if k in row_keyword_list:
-				scores_fre_general[row['question_num']] = scores_fre_general[row['question_num']] +1
+				scores_fre_general[row['question']] = scores_fre_general[row['question']] +1
 	for row in db.question_table.find({'type': "general"}):
-		tmp_prob = scores_fre_general[row['question_num']] / row['num_of_keyword']
+		tmp_prob = scores_fre_general[row['question']] / row['num_of_keyword']
 		if tmp_prob > 0.6:
-			pass_general_list.append(row['question_num'])
+			pass_general_list.append(row['question'])
 	
 	for row in db.question_table.find({'type': "sensor"}):
-		scores_fre_sensor[row['question_num']] = 0
+		scores_fre_sensor[row['question']] = 0
 		row_keyword_list = row['keyword_list']
 		for k in q_keywords:
 			if k in row_keyword_list:
-				scores_fre_sensor[row['question_num']] = scores_fre_sensor[row['question_num']] +1
+				scores_fre_sensor[row['question']] = scores_fre_sensor[row['question']] +1
 	for row in db.question_table.find({'type': "sensor"}):
-		tmp_prob = scores_fre_sensor[row['question_num']] / row['num_of_keyword']
+		tmp_prob = scores_fre_sensor[row['question']] / row['num_of_keyword']
 		if tmp_prob == 1 :
-			pass_sensor_list.append(row['question_num'])
-	
-	
+			pass_sensor_list.append(row['question'])
 	
 	if len(pass_general_list)!= 0 :
 		general_most_fre = scores_fre_general[pass_general_list[0]]
-		general_most_qnum = pass_general_list[0]
+		general_most_q = pass_general_list[0]
 		for i in pass_general_list:
 			tmp_fre = scores_fre_general[i]
 			if tmp_fre > general_most_fre:
 				general_most_fre = tmp_fre
-				general_most_qnum = i
+				general_most_q = i
 				
 	if len(pass_sensor_list)!= 0 :
 		sensor_most_fre = scores_fre_sensor[pass_sensor_list[0]]
-		sensor_most_qnum = pass_sensor_list[0]
+		sensor_most_q = pass_sensor_list[0]
 		for i in pass_sensor_list:
 			tmp_fre = scores_fre_sensor[i]
 			if tmp_fre > sensor_most_fre:
 				sensor_most_fre = tmp_fre
-				sensor_most_qnum = i
+				sensor_most_q = i
 	
 	
 	
@@ -166,17 +164,14 @@ def integrateQA(q_keywords):
 	else: 
 		type = "neither"
 	
-	result = {}
 	if type == "sQA":
-		result["type"] = type
-		result["q_num"] = sensor_most_qnum
+		q_num = db.question_table.find_one({'question': sensor_most_q})['question_num']
 	elif type == "gQA":
-		result["type"] = type
-		result["q_num"] = general_most_qnum
+		q_num = db.question_table.find_one({'question': general_most_q})['question_num']
 	else:
-		result["type"] = type
+		q_num = 0
 		
-	return result
+	return type, q_num
 	
 
 if __name__ == '__main__':
