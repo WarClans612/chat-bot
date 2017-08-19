@@ -3,6 +3,7 @@ sys.path.append("C:/Users/plum/Documents/Python Scripts/chat-bot")
 from bot import bot_config
 from bot import bot_function as bot
 from bot import method 
+import re
 
 from pymessager.message import Messager
 from pymessager.message import QuickReply
@@ -14,22 +15,49 @@ from fb_api_config import verification_code
 def QA(question):
 	words = bot.segment(question)
 	slots, rest_words = bot.get_slots(words)
-	type, question_num = method.integrateQA(rest_words)
+	if len(rest_words) == 0:
+		type = "neither"
+		question_num = 0
+	elif "訂閱" in rest_words:
+		if "取消" in rest_words:
+			type = "UNSUB"
+			question_num = 0
+		else:
+			type = "SUB"
+			question_num = 0
+	else:
+		type, question_num = method.integrateQA(rest_words)
+		
 	if type == "gQA":
-		answer = bot.get_answer(question_num,slots.copy())
+		type = "gQA"
 	elif type == "sQA":
 		if slots.get("space"):
-			answer = bot.get_answer(question_num,slots.copy())
+			type = "sQA_with_space"
 		else:	
-			answer = ""
+			type = "sQA_without_space"
+	elif type == "SUB":
+		type = "SUB"
+	elif type == "UNSUB":
+		type = "UNSUB"
 	else: 
-		answer = ""
-		if len(slots) != 0:
-			type = "slots"
+		if slots.get('space') and slots.get('time'):
+			type = "space_and_time"
+		elif slots.get('space'):
+			type = "space"
+		elif slots.get('time'):
+			type = "time"
 		else:
 			type = "neither"
-	return type, question_num, answer, slots
+	return type, question_num, slots
 
+def gQA_get_answer(question_num):
+	answer = bot.get_answer(question_num,{})
+	return answer
+	
+def sQA_get_answer(question_num,slots):
+	answer = bot.get_answer(question_num,slots.copy())
+	return answer
+	
 def QAlocation(question,location):
 	words = bot.segment(question+location)
 	slots, rest_words = bot.get_slots(words)

@@ -4,58 +4,32 @@ import urllib.request
 import urllib.parse
 import json
 import os
+import datetime as DT
 from datetime import datetime #datetime.datetime
+import pymongo
+from pymongo import MongoClient
 
-from sensor_config import weather_token
-
-def parse_json_data(pure_data):
-	location = pure_data['records']['location']
-	Location_list = {}
-	for L in location:
-		Location_list[L['locationName']] = {}
-		for element in L['weatherElement']:
-			for E in element['time']:
-				start_time = datetime.strptime(E['startTime'], "%Y-%m-%d %H:%M:%S")
-				if( start_time not in Location_list[L['locationName']] ):
-					Location_list[L['locationName']][start_time] = {}
-					end_time = datetime.strptime(E['endTime'], "%Y-%m-%d %H:%M:%S")
-					Location_list[L['locationName']][start_time]['endTime'] = end_time
-				Location_list[L['locationName']][start_time][element['elementName']] = E['parameter']['parameterName']
-	return Location_list
-
-def grab_data(Data_set,Location_name):
-	#Data_set = input("請輸入資料集編號: ")
-	#Location_name = input("請輸入地點(預設全選): ")
-
-#connect to cwb api
-	urll = 'http://opendata.cwb.gov.tw/api/v1/rest/datastore/'+Data_set+'?'
-	Location_name = Location_name.strip()
-	if Location_name:
-		urll = urll+'locationName='
-		target_url = urllib.request.Request(urll+ urllib.parse.quote(Location_name, safe='')+'&sort=time')
+def get_weather(Location_name,time):
+	db_url = "127.0.0.1:27017"
+	db_name = 'bot'
+	client = MongoClient(db_url,  27017)
+	db = client['bot']
+	collect = db['weather_data']
+	
+	if time == "now":
+		now_time = datetime.now()
+		item = collect.find_one({'endTime': {'$gt': now_time},'startTime': {'$lt': now_time},'locationName':Location_name})
 	else:
-		target_url = urllib.request.Request(urll+ urllib.parse.quote(Location_name, safe='')+'sort=time')
-
-	target_url.add_header( 'Authorization' , weather_token)
-	fp = urllib.request.urlopen(target_url)
-	pure_data = json.loads(fp.read().decode('utf-8'))
-	fp.close()
-
-	with open("output.json","w") as file:
-		pprint(pure_data,file)
-
-	data_list = parse_json_data(pure_data)
-	#print(data_list)
-
-	with open("output.dat","w") as file:
-		pprint(data_list,file)
-
-	return data_list
+		now_time = datetime.now()
+		now_day = datetime(now_time.year, now_time.month, now_time.day, 12, 0, 0, 0)
+		next_day = now_day + DT.timedelta(days=1)
+		item = collect.find_one({'endTime': {'$gt': next_day},'startTime': {'$lt': next_day},'locationName':Location_name})
+	
+	return item
 	
 if __name__ == "__main__":
-	Data_set = "F-C0032-001"
 	Location_name = "新竹市"
-	data_list = grab_data(Data_set,Location_name)
-	for data in data_list["新竹市"]:
-		print (data)
+	item = get_weather(Location_name)
+	print(item)
+	
 

@@ -5,6 +5,7 @@ import jieba.analyse
 from pymongo import MongoClient
 import math
 import bot_config
+import json
 
 topK = 20
 withWeight = False
@@ -16,7 +17,7 @@ def open_qa_file(filename):
 	question_num_set = []
 	answer_set = []
 	answer_num_set = []
-	i = 0
+	i = 1
 	flag_pre = 'N'
 	with open(filename, 'r', encoding='utf8') as fr:
 		for line in fr:
@@ -79,21 +80,83 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
 
 	return keywords, keyword_set, num_of_keyword
 	
+def sensor_data_init(sensor_start_num, sensor_filename):
+	fr = open(sensor_filename,"r",encoding = "utf8")
+	text = fr.read()
+	j_data = json.loads(text)
+	
+	###for question_table
+	sensor_keywords = []
+	question_num = sensor_start_num
+	data_list = []
+	for item in j_data:
+		for q in item["Q"]:
+			data = {}
+			data["type"] = "sensor"
+			data["question_num"] =  question_num
+			data["handle_code"] = item["H"]
+			data["question"] = q
+			keyword_list = jieba.analyse.extract_tags(q, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+			data["keyword_list"] =  keyword_list
+			sensor_keywords.extend(keyword_list)
+			data["num_of_keyword"] = len(keyword_list)
+			data_list.append(data)
+		question_num = question_num +1
+	#print(data_list)
+	#print(sensor_keywords)
+	sensor_question_list = data_list
+	
+	###for handle_table
+	data_list = []
+	for item in j_data:
+		answer_code = 1
+		for a in item["A"]:
+			data = {}
+			data["handle_code"] = item["H"]
+			data["answer_code"] = a["answer_code"]
+			data["A_template"] = a["answer_template"]
+			data_list.append(data)
+			answer_code = answer_code +1
+	#print(data_list)
+	sensor_handle_list = data_list
+	
+	###for button_table
+	data_list = []
+	question_num = sensor_start_num
+	for item in j_data:
+		data = {}
+		data["question_num"] = question_num
+		data["button_list"] = item["B"]
+		data_list.append(data)
+		question_num = question_num +1
+	#print(data_list)
+	sensor_button_list = data_list
+	
+	return sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list
+		
+	
+	
 if __name__ == '__main__':
 	### Init QA from file
 	filename = bot_config.QAset
 	sensor_filename = bot_config.sensorQAset
 	question_set, question_num_set, answer_set, answer_num_set = open_qa_file(filename)
-	sensor_question_set, sensor_question_num_set, sensor_answer_set, sensor_answer_num_set = open_sensor_qa_file(sensor_filename)
+	#sensor_question_set, sensor_question_num_set, sensor_answer_set, sensor_answer_num_set = open_sensor_qa_file(sensor_filename)
 
 	### Initialize jieba
 	stop_words_filename = 'extra_dict/stop_words.txt'
 	idf_filename = 'extra_dict/idf.txt.big'
+
 	jieba.set_dictionary('extra_dict/zh-tw_dict.txt')
 	jieba.load_userdict("extra_dict/my_dict.txt")
 	jieba.load_userdict("extra_dict/location_dict.txt")
+	jieba.analyse.set_stop_words(stop_words_filename)
+	jieba.analyse.set_idf_path(idf_filename)
+	
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
-	sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
+	sensor_start_num = question_num_set[len(question_num_set)-1] + 1
+	sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list = sensor_data_init(sensor_start_num,sensor_filename)
+	#sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
 	keywords.extend(sensor_keywords)
 	
 	###connect to DB:"bot"
@@ -108,6 +171,7 @@ if __name__ == '__main__':
 	db.drop_collection('handle_table')
 	db.drop_collection('keyword_data')
 	db.drop_collection('statistic_data')
+	db.drop_collection('button_table')
 	
 	### Save into DB table:"question_table"
 	collect = db['question_table']
@@ -117,20 +181,22 @@ if __name__ == '__main__':
 				"question_num": question_num_set[i],
 				"keyword_list": keyword_set[i],
 				"num_of_keyword": num_of_keyword[i],
-				"handle_code": 0,
+				"handle_code": "None",
 				"type": "general"
 				}
 		collect.insert_one(data)
-	sensor_start_num = question_num_set[len(question_num_set)-1] + 1
-	for i in range(len(sensor_question_set)):
-		data = {"question": sensor_question_set[i],
-				"question_num": sensor_start_num + sensor_question_num_set[i],
-				"keyword_list": sensor_keyword_set[i],
-				"num_of_keyword": sensor_num_of_keyword[i],
-				"handle_code": sensor_question_num_set[i] + 1 ,
-				"type": "sensor"
-				}
+	for data in sensor_question_list:
 		collect.insert_one(data)
+	# sensor_start_num = question_num_set[len(question_num_set)-1] + 1
+	# for i in range(len(sensor_question_set)):
+		# data = {"question": sensor_question_set[i],
+				# "question_num": sensor_start_num + sensor_question_num_set[i],
+				# "keyword_list": sensor_keyword_set[i],
+				# "num_of_keyword": sensor_num_of_keyword[i],
+				# "handle_code": sensor_question_num_set[i] + 1 ,
+				# "type": "sensor"
+				# }
+		# collect.insert_one(data)
 	"""
 	data = {"question": "現在適合出門嗎?",
 			 "question_num": 0,
@@ -157,18 +223,21 @@ if __name__ == '__main__':
 	
 	### Save into DB table:"handle_table"
 	collect = db['handle_table']
-	flag_handle = 0
-	for i in range(len(sensor_answer_set)):
-		if flag_handle != (sensor_answer_num_set[i] + 1) :
-			flag_handle = sensor_answer_num_set[i] + 1
-			answer_code = 1
-		else:
-			answer_code += 1 
-		data = {"handle_code": sensor_answer_num_set[i] + 1,
-				"answer_code": answer_code,
-				"A_template": sensor_answer_set[i]
-			}
+	for data in sensor_handle_list:
 		collect.insert_one(data)
+	
+	# flag_handle = 0
+	# for i in range(len(sensor_answer_set)):
+		# if flag_handle != (sensor_answer_num_set[i] + 1) :
+			# flag_handle = sensor_answer_num_set[i] + 1
+			# answer_code = 1
+		# else:
+			# answer_code += 1 
+		# data = {"handle_code": sensor_answer_num_set[i] + 1,
+				# "answer_code": answer_code,
+				# "A_template": sensor_answer_set[i]
+			# }
+		# collect.insert_one(data)
 	print("[handle_table]")
 	for post in collect.find():
 		print (post)
@@ -206,5 +275,14 @@ if __name__ == '__main__':
 	collect.insert_one(data)
 
 	print("[statistic_data]")
+	for post in collect.find():
+		print (post)
+		
+	### Save into DB table:"button_table"
+	collect = db['button_table']
+	for data in sensor_button_list:
+		collect.insert_one(data)
+
+	print("[button_table]")
 	for post in collect.find():
 		print (post)

@@ -1,0 +1,10 @@
+[
+{ 
+	"tag": "SUB_WEATHER" ,
+	"text": "確定要訂閱#space#的天氣嗎?",
+	"button_list":[
+			{ "title": "沒錯", "payload" : "SUB_WEATHER_S=#space#" },
+			{ "title": "我想訂閱其它縣市", "payload" : "SUB_" }
+		]	
+}
+]

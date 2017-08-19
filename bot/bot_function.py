@@ -10,6 +10,7 @@ import re
 #import my_pm25 as pm25
 from sensor_fetch import get_pm25 as pm25
 from sensor_fetch import get_weather as weather
+from sensor_fetch import get_uvi as UVI
 from datetime import datetime #datetime.datetime
 import urllib.request
 import urllib.parse
@@ -104,9 +105,13 @@ def sensor_handler(handle_code,slots):
 	rain_bound = [20]
 	temperature_bound = [20,30]
 	air_quality_bound = [10,15,25,35]
-	temperature, rainfull_prob = get_weather(slots)
-	air_quality = get_air_quality(slots)
-	if handle_code == 1 :
+	uvi_bound = [6,8,11]
+	temperature = 0
+	rainfull_prob = 0
+	air_quality = 0
+	uvi = 0
+	if handle_code == "WEATHER" :
+		temperature, rainfull_prob = get_weather(slots)
 		if rainfull_prob < rain_bound[0]:
 			if temperature < temperature_bound[0]:
 				answer_code = 1
@@ -121,12 +126,14 @@ def sensor_handler(handle_code,slots):
 				answer_code = 5
 			else:
 				answer_code = 6
-	elif handle_code == 2:
+	elif handle_code == "RAIN":
+		temperature, rainfull_prob = get_weather(slots)
 		if rainfull_prob < rain_bound[0]:
 			answer_code = 1
 		else:
 			answer_code = 2
-	elif handle_code == 3:
+	elif handle_code == "PM25":
+		air_quality = get_air_quality(slots)
 		if air_quality < air_quality_bound[0]:
 			answer_code = 1
 		elif air_quality < air_quality_bound[1]:
@@ -135,39 +142,84 @@ def sensor_handler(handle_code,slots):
 			answer_code = 3
 		else:
 			answer_code = 4
-	elif handle_code == 4:
-		if air_quality < air_quality_bound[1]:
-			if rainfull_prob < rain_bound[0]:
-				if temperature < temperature_bound[0]:
-					answer_code = 1
-				elif temperature < temperature_bound[1]:
-					answer_code = 2
+	elif handle_code == "GOOUT":
+		air_quality = get_air_quality(slots)
+		temperature, rainfull_prob = get_weather(slots)
+		uvi = get_uvi(slots)
+		if uvi < uvi_bound[1]:
+			if air_quality < air_quality_bound[1]:
+				if rainfull_prob < rain_bound[0]:
+					if temperature < temperature_bound[0]:
+						answer_code = 1
+					elif temperature < temperature_bound[1]:
+						answer_code = 2
+					else:
+						answer_code = 3
 				else:
-					answer_code = 3
+					if temperature < temperature_bound[0]:
+						answer_code = 4
+					elif temperature < temperature_bound[1]:
+						answer_code = 5
+					else:
+						answer_code = 6
 			else:
-				if temperature < temperature_bound[0]:
-					answer_code = 4
-				elif temperature < temperature_bound[1]:
-					answer_code = 5
+				if rainfull_prob < rain_bound[0]:
+					if temperature < temperature_bound[0]:
+						answer_code = 7
+					elif temperature < temperature_bound[1]:
+						answer_code = 8
+					else:
+						answer_code = 9
 				else:
-					answer_code = 6
+					if temperature < temperature_bound[0]:
+						answer_code = 10
+					elif temperature < temperature_bound[1]:
+						answer_code = 11
+					else:
+						answer_code = 12
 		else:
-			if rainfull_prob < rain_bound[0]:
-				if temperature < temperature_bound[0]:
-					answer_code = 7
-				elif temperature < temperature_bound[1]:
-					answer_code = 8
+			if air_quality < air_quality_bound[1]:
+				if rainfull_prob < rain_bound[0]:
+					if temperature < temperature_bound[0]:
+						answer_code = 13
+					elif temperature < temperature_bound[1]:
+						answer_code = 14
+					else:
+						answer_code = 15
 				else:
-					answer_code = 9
+					if temperature < temperature_bound[0]:
+						answer_code = 16
+					elif temperature < temperature_bound[1]:
+						answer_code = 17
+					else:
+						answer_code = 18
 			else:
-				if temperature < temperature_bound[0]:
-					answer_code = 10
-				elif temperature < temperature_bound[1]:
-					answer_code = 11
+				if rainfull_prob < rain_bound[0]:
+					if temperature < temperature_bound[0]:
+						answer_code = 19
+					elif temperature < temperature_bound[1]:
+						answer_code = 20
+					else:
+						answer_code = 21
 				else:
-					answer_code = 12
+					if temperature < temperature_bound[0]:
+						answer_code = 22
+					elif temperature < temperature_bound[1]:
+						answer_code = 23
+					else:
+						answer_code = 24
+	elif handle_code == "UVI":
+		uvi = get_uvi(slots)
+		if uvi < uvi_bound[0]:
+			answer_code = 1
+		elif uvi < uvi_bound[1]:
+			answer_code = 2
+		elif uvi < uvi_bound[2]:
+			answer_code = 3
+		else:
+			answer_code = 4
 	else: 
-		print("[err: no such handle_code]")
+		print("[err: no such handle_code -- ",handle_code," ]")
 		
 	###connect to DB:"bot"
 	db_url = bot_config.db_url 
@@ -175,10 +227,73 @@ def sensor_handler(handle_code,slots):
 	client = MongoClient(db_url)
 	db = client[db_name]
 	A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
-	replace_temperature = "#temperature#"
-	replace_rainfull_prob = "#rainfull_prob#"
-	answer = re.sub(replace_temperature, str(temperature), A_template)
-	answer = re.sub(replace_rainfull_prob, str(rainfull_prob), answer)
+	answer = A_template
+	replace_mapping = {"#temperature#" : temperature , "#rainfull_prob#" : rainfull_prob , "#pm25#" : air_quality , "#uvi#" : uvi}
+	for pattern in replace_mapping :
+		if re.search(pattern, A_template) != None:
+			answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
+	if "time" in slots:
+		if slots["time"] == "now":
+			time_str = "目前"
+		else:
+			time_str = "明天"
+	else:
+		time_str = "目前"
+	answer = re.sub("#time#", str(time_str), answer)
+	answer = re.sub("#space#", str(slots["space"]), answer)
+	return answer
+
+def sensor_handler_for_subscription(handle_code,slots):
+	air_quality_bound = [10,15,25,35]
+	uvi_bound = [6,8,11]
+	air_quality = 0
+	uvi = 0
+	answer_code = 0
+	if handle_code == "PM25":
+		air_quality = get_air_quality(slots)
+		if air_quality < air_quality_bound[0]:
+			answer_code = 1
+		elif air_quality < air_quality_bound[1]:
+			answer_code = 2
+		elif air_quality < air_quality_bound[2]:
+			answer_code = 3
+		else:
+			answer_code = 4
+	elif handle_code == "UVI":
+		uvi = get_uvi(slots)
+		if uvi < uvi_bound[0]:
+			answer_code = 1
+		elif uvi < uvi_bound[1]:
+			answer_code = 2
+		elif uvi < uvi_bound[2]:
+			answer_code = 3
+		else:
+			answer_code = 4
+	else: 
+		print("[err: no such handle_code -- ",handle_code," ]")
+		
+	###connect to DB:"bot"
+	db_url = bot_config.db_url 
+	db_name = bot_config.db_name
+	client = MongoClient(db_url)
+	db = client[db_name]
+	A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
+	answer = A_template
+	replace_mapping = { "#pm25#" : air_quality , "#uvi#" : uvi}
+	for pattern in replace_mapping :
+		if re.search(pattern, A_template) != None:
+			answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
+	if "time" in slots:
+		if slots["time"] == "now":
+			time_str = "目前"
+		else:
+			time_str = "明天"
+	else:
+		time_str = "目前"
+	answer = re.sub("#time#", str(time_str), answer)
+	answer = re.sub("#space#", str(slots["space"]), answer)
+	#if answer_code <= 2 :
+	#	answer = None
 	return answer
 	
 def get_answer(question_num,slots):
@@ -188,8 +303,9 @@ def get_answer(question_num,slots):
 	client = MongoClient(db_url)
 	db = client[db_name]
 	handle_code = db.question_table.find_one({'question_num':question_num})['handle_code']
+	type = db.question_table.find_one({'question_num':question_num})['type']
 	
-	if handle_code == 0 : #general QA
+	if type == "general" : #general QA
 		answer = db.answer_table.find_one({'question_num':question_num})['answer']
 	else : #sensor related QA
 		answer = sensor_handler(handle_code,slots)
@@ -202,31 +318,19 @@ def get_weather(slots):
 		# slots["space"] = "新竹市"
 	if "time" not in slots:
 		slots["time"] = "now"
-	data_list = weather.grab_data(Data_set = "F-C0032-001",Location_name = slots["space"])
-	if slots["time"] == "now":
-		for t in data_list[slots["space"]]:
-			#time = datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
-			if datetime.now() > t:
-				temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
-				rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
-				break
-		for t in data_list[slots["space"]]:
-			temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
-			rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
-			break
-	else :
-		for t in data_list[slots["space"]]:
-			#time = datetime.strptime(t, "%Y-%m-%d %H:%M:%S")
-			if datetime.now().date() < t.date():
-				temperature = (int(data_list[slots["space"]][t]['MaxT']) + int(data_list[slots["space"]][t]['MinT'])) /2
-				rainfull_prob = int(data_list[slots["space"]][t]['PoP'])
-				break
+	item = weather.get_weather(Location_name = slots["space"], time = slots["time"])
+	temperature = float(item["temperature"])
+	rainfull_prob = int(item["rainfull_prob"])
 	return temperature, rainfull_prob
 	
 def get_air_quality(slots):
 	#air_quality = 18
 	air_quality = pm25.get_pm25(slots["space"])
 	return float(air_quality)
+	
+def get_uvi(slots):
+	uvi = UVI.get_uvi(slots["space"])
+	return float(uvi)
 	
 def get_slots(words):
 	slots = {}

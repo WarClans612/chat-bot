@@ -20,8 +20,8 @@ def get_area(location):
 			area3 = addr['long_name']
 		
 	if area1 != "":
-		return area1+area3
+		return area1,area3
 	elif area2 != "":
-		return area2+area3
+		return area2,area3
 		
-	return "不知道"
+	return "不知道",""
