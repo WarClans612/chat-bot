@@ -292,8 +292,8 @@ def sensor_handler_for_subscription(handle_code,slots):
 		time_str = "目前"
 	answer = re.sub("#time#", str(time_str), answer)
 	answer = re.sub("#space#", str(slots["space"]), answer)
-	#if answer_code <= 2 :
-	#	answer = None
+	if answer_code <= 2 :
+		answer = None
 	return answer
 	
 def get_answer(question_num,slots):
