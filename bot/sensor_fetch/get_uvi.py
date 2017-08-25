@@ -62,6 +62,34 @@ def get_uvi(Location_name):
 	
 	return uvi
 	
+def get_uvi_station(SiteName):		
+	db_url = "127.0.0.1:27017"
+	db_name = 'bot'
+	client = MongoClient(db_url,  27017)
+	db = client['bot']
+	collect = db['uvi_data']
+	
+	now_time = datetime.now()
+	now_hour = datetime(now_time.year, now_time.month, now_time.day, now_time.hour, 0, 0, 0)
+	item = collect.find_one({'PublishTime': {'$eq': now_hour},'SiteName':SiteName})
+	
+	if item == None:
+		before_hour = now_hour - DT.timedelta(hours=1)
+		item = collect.find_one({'PublishTime': {'$eq': before_hour},'SiteName':SiteName})
+		if item == None:
+			before_hour = before_hour - DT.timedelta(hours=1)
+			item = collect.find_one({'PublishTime': {'$eq': before_hour},'SiteName':SiteName})
+			if item == None:
+				now_day = datetime(now_time.year, now_time.month, now_time.day, 0, 0, 0, 0)
+				item = collect.find_one({'PublishTime': {'$gt': now_day},'SiteName':SiteName})
+				if item == None:
+					return 0.0
+		uvi = item['UVI']
+	else:
+		uvi = item['UVI']
+	
+	return uvi
+	
 def get_county():
 	db_url = "127.0.0.1:27017"
 	db_name = 'bot'

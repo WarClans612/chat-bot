@@ -22,7 +22,11 @@ def save_pm25():
 		time = datetime.strptime(i['PublishTime'], "%Y-%m-%d %H:%M")
 		data = {}
 		data['County'] = i['County']
-		data['PM25'] = i['PM2.5']
+		if i['PM2.5'] == "ND" or i['PM2.5'] == "":
+			data['PM25'] = 0
+		else:
+			data['PM25'] = int(i['PM2.5'])
+		print(data['PM25'])
 		data['PublishTime'] = time
 		data['SiteName'] = i['SiteName']
 		new_data_list.append(data)

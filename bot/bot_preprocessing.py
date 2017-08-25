@@ -132,14 +132,61 @@ def sensor_data_init(sensor_start_num, sensor_filename):
 	#print(data_list)
 	sensor_button_list = data_list
 	
-	return sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list
-		
+	i_start_num = question_num
 	
+	return sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list, i_start_num
+		
+def i_data_init(i_start_num, i_filename):
+	fr = open(i_filename,"r",encoding = "utf8")
+	text = fr.read()
+	j_data = json.loads(text)
+	
+	###for question_table
+	i_keywords = []
+	question_num = i_start_num
+	data_list = []
+	for item in j_data:
+		for q in item["Q"]:
+			data = {}
+			data["type"] = "i"
+			data["question_num"] =  question_num
+			data["handle_code"] = item["H"]
+			data["HL_code"] = item["HL"]
+			data["question"] = q
+			keyword_list = jieba.analyse.extract_tags(q, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+			data["keyword_list"] =  keyword_list
+			i_keywords.extend(keyword_list)
+			data["num_of_keyword"] = len(keyword_list)
+			data_list.append(data)
+		question_num = question_num +1
+	#print(data_list)
+	#print(sensor_keywords)
+	i_question_list = data_list
+	
+	
+	question_num = i_start_num
+	###for handle_table
+	data_list = []
+	for item in j_data:
+		data = {}
+		data["question_num"] = question_num
+		data["answer"] = item["A"]
+		data_list.append(data)
+		question_num = question_num +1
+	#print(data_list)
+	i_answer_list = data_list
+	
+	i_start_num = question_num
+	
+	return i_keywords,i_question_list,i_answer_list
+		
+		
 	
 if __name__ == '__main__':
 	### Init QA from file
 	filename = bot_config.QAset
 	sensor_filename = bot_config.sensorQAset
+	i_filename = bot_config.iQAset
 	question_set, question_num_set, answer_set, answer_num_set = open_qa_file(filename)
 	#sensor_question_set, sensor_question_num_set, sensor_answer_set, sensor_answer_num_set = open_sensor_qa_file(sensor_filename)
 
@@ -155,7 +202,8 @@ if __name__ == '__main__':
 	
 	keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
 	sensor_start_num = question_num_set[len(question_num_set)-1] + 1
-	sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list = sensor_data_init(sensor_start_num,sensor_filename)
+	sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list, i_start_num = sensor_data_init(sensor_start_num,sensor_filename)
+	i_keywords,i_question_list,i_answer_list = i_data_init(i_start_num,i_filename)
 	#sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
 	keywords.extend(sensor_keywords)
 	
@@ -187,6 +235,8 @@ if __name__ == '__main__':
 		collect.insert_one(data)
 	for data in sensor_question_list:
 		collect.insert_one(data)
+	for data in i_question_list:
+		collect.insert_one(data)
 	# sensor_start_num = question_num_set[len(question_num_set)-1] + 1
 	# for i in range(len(sensor_question_set)):
 		# data = {"question": sensor_question_set[i],
@@ -217,6 +267,7 @@ if __name__ == '__main__':
 				"answer": answer_set[i]
 			}
 		collect.insert_one(data)
+	collect.insert(i_answer_list)
 	print("[answer_table]")
 	for post in collect.find():
 		print (post)

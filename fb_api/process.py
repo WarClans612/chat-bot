@@ -28,7 +28,9 @@ def QA(question):
 	else:
 		type, question_num = method.integrateQA(rest_words)
 		
-	if type == "gQA":
+	if type == "iQA":
+		type = "iQA"
+	elif type == "gQA":
 		type = "gQA"
 	elif type == "sQA":
 		if slots.get("space"):
@@ -57,6 +59,15 @@ def gQA_get_answer(question_num):
 def sQA_get_answer(question_num,slots):
 	answer = bot.get_answer(question_num,slots.copy())
 	return answer
+	
+def iQA_get_answer(question_num):
+	answer = bot.get_answer(question_num,{})
+	return answer
+	
+def sQA_location_get_answer(question_num,slots,location):
+	answer = bot.get_location_sQA_answer(question_num,slots.copy(),location)
+	return answer
+	
 	
 def QAlocation(question,location):
 	words = bot.segment(question+location)

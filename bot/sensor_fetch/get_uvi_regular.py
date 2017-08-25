@@ -23,7 +23,12 @@ def save_uvi():
 		time = datetime.strptime(i['PublishTime'], "%Y-%m-%d %H:%M")
 		data = {}
 		data['County'] = i['County']
-		data['UVI'] = i['UVI']
+		if i['UVI'] == "":
+			data['UVI'] = 0.0
+		elif float(i['UVI']) > 0:
+			data['UVI'] = float(i['UVI'])
+		else:
+			data['UVI'] = 0.0
 		data['PublishTime'] = time
 		data['SiteName'] = i['SiteName']
 		data['WGS84Lon'] = i['WGS84Lon']

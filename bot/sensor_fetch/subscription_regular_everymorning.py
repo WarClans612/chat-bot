@@ -6,6 +6,7 @@ from bot import bot_config
 import mongodb as M
 import send_request as send
 import bot_function as BOT
+mapping = {"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
 
 def get_users(handle_code):
 	mongo_client, db, collect = M.open_connection()
@@ -26,9 +27,11 @@ def push_notice(handle_code,user_list,pushed_user_id_list):
 			slots = {}
 			slots["time"] = "now"
 			slots["space"] = user["space"]
-			answer = BOT.sensor_handler(handle_code,slots)
-			send.send_text(user["user_id"], "[訂閱]"+answer)
-			pushed_user_id_list.append(user["user_id"])
+			answer = BOT.sensor_handler_for_subscription(handle_code,slots)
+			if answer!=None:
+				text = "[訂閱-"+mapping[handle_code]+"]"+answer
+				send.send_text(user["user_id"], text)
+				pushed_user_id_list.append(user["user_id"])
 		
 	
 	

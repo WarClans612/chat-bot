@@ -65,7 +65,10 @@ def get_text(user_id,text):
 	if state == "default":
 		type, question_num, slots = process.QA(text)
 		print("{}'s type is {}".format(user_id,type))
-		if type == "gQA":	
+		if type == "iQA":
+			answer = process.iQA_get_answer(question_num)
+			send.send_text(user_id, answer)
+		elif type == "gQA":	
 			answer = process.gQA_get_answer(question_num)
 			send.send_text(user_id, answer)
 		elif type == "sQA_with_space":
@@ -126,8 +129,10 @@ def get_text(user_id,text):
 			button_list = M.get_subscribe_button_list(db,user_id,question_num)
 			send.send_sQA_answer(user_id,answer,button_list)
 			M.set_state(collect, user_id, "default")
+			M.save_qnum(collect, user_id, question_num)
 		elif type == "sQA_without_space":
 			send.query_location(user_id)
+			M.save_qnum(collect, user_id, question_num)
 		elif type == "space_and_time" or type == "space":
 			M.save_space(collect, user_id, slots["space"])
 			last_q_num = M.get_data(collect, user_id, "question_num")
@@ -184,7 +189,7 @@ def get_location(user_id,location):
 	else:
 		last_q_num = M.get_data(collect, user_id, "question_num")
 		print("{}'s last quesiotn is {}".format(user_id,last_q_num))
-		answer = process.sQA_get_answer(last_q_num,slots)
+		answer = process.sQA_location_get_answer(last_q_num,slots,location)
 		button_list = M.get_subscribe_button_list(db,user_id,last_q_num)
 		send.send_sQA_answer(user_id,answer,button_list)
 	

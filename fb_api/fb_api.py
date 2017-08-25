@@ -12,6 +12,17 @@ def index():
 	fw.close()
 	return "<p>Hello World!</p>"
 	
+@app.route('/privacypolicy')
+def privacy():
+	text = "<p>[臺灣生活環境小幫手 隱私權政策]</p>\
+			<p>登入: 直接對話即可使用</p>\
+			<p>隱私權: 只會取得使用者所傳之訊息</p>\
+			<p>訂閱: 可以在對話框輸入[訂閱]來選擇訂閱內容,且一天一項目只會打擾一次</p>\
+			<p>      並且可以輸入[取消訂閱]來做取消動作</p>\
+			<p>	     決不在違反使用者意願情況下主動傳訊息</p>\
+			"
+	return text
+	
 @app.route('/image')
 def image():
 	return render_template('image.html')

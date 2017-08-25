@@ -48,7 +48,13 @@ def send_sQA_answer(user_id,answer,button_list):
 def send_subscribe_mess(user_id, TF, tag, space):
 	client = Messager(facebook_access_token)
 	if TF == True:
-		text = "已經幫您訂閱"+space+"的"+mapping[tag]
+		if tag in ["WEATHER","RAIN","GOOUT"]:
+			text = "已經幫您訂閱"+space+"的"+mapping[tag]+", 將會在每天早上通知喔!"
+		elif tag in ["PM25","UVI"]:
+			text = "已經幫您訂閱"+space+"的"+mapping[tag]+", 只會在數值過量時通知喔!"
+		else:
+			print("[ERR] no this type of tag")
+			text = "已經幫您訂閱"+space+"的"+mapping[tag]
 	else:
 		text = "好的,若需要訂閱相關資訊再告訴我[訂閱]喔"
 	client.send_text(user_id, text)
