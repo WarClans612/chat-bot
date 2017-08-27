@@ -2,6 +2,7 @@ import json
 from pymessager.message import Messager
 from pymessager.message import QuickReply
 from pymessager.message import ContentType
+import random
 
 from fb_api_config import facebook_access_token 
 mapping = {"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
@@ -33,8 +34,15 @@ def hello_to_new_user(user_id):
 	client.send_text(user_id, text)
 	
 def say_something(user_id):
-	text = "我還小聽不懂> <\
-			可以問我天氣或空氣品質的問題唷~"
+	text_list = [
+		"可以問我天氣或空氣品質的問題唷~",
+		"可以問我天氣或是紫外線指數狀況喔!",
+		"跟我訂閱資訊,可以即時通知喔~",
+		"快來跟我訂閱資訊,讓你出門不煩惱",
+		"有什麼建議可以在粉專上面留言給我媽咪唷~",
+		]
+	num = random.randint(0,len(text_list))
+	text = "我還小聽不懂> <  " + text_list[num]
 	client = Messager(facebook_access_token)
 	client.send_text(user_id, text)
 	

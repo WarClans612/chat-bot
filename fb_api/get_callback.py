@@ -55,7 +55,7 @@ def get_text(user_id,text):
 	print("{} says {}".format(user_id,text))
 
 	mongo_client, db, collect = M.open_connection()
-	if M.new_user(collect, user_id): 
+	if M.new_user(db, user_id): 
 		print("new user coming!")
 		send.hello_to_new_user(user_id)
 	
@@ -64,6 +64,14 @@ def get_text(user_id,text):
 	
 	if state == "default":
 		type, question_num, slots = process.QA(text)
+		
+		if slots.get("time"):
+			M.save_time(collect, user_id, slots["time"])
+		else:
+			time = M.check_time(collect, user_id)
+			if time != None:
+				slots["time"] = time
+			
 		print("{}'s type is {}".format(user_id,type))
 		if type == "iQA":
 			answer = process.iQA_get_answer(question_num)
@@ -118,6 +126,14 @@ def get_text(user_id,text):
 			
 	elif state == "wait_location":
 		type, question_num, slots = process.QA(text)
+		
+		if slots.get("time"):
+			M.save_time(collect, user_id, slots["time"])
+		else:
+			time = M.check_time(collect, user_id)
+			if time != None:
+				slots["time"] = time
+		
 		print("{}'s type is {}".format(user_id,type))
 		if type == "gQA":	
 			answer = process.gQA_get_answer(question_num)
@@ -146,6 +162,14 @@ def get_text(user_id,text):
 			
 	elif state == "wait_subscription_location":
 		type, question_num, slots = process.QA(text)
+		
+		if slots.get("time"):
+			M.save_time(collect, user_id, slots["time"])
+		else:
+			time = M.check_time(collect, user_id)
+			if time != None:
+				slots["time"] = time
+		
 		if slots.get("space"):
 			M.save_space(collect, user_id, slots["space"])
 			TF = True
@@ -162,7 +186,7 @@ def get_text(user_id,text):
 def get_location(user_id,location):
 
 	mongo_client, db, collect = M.open_connection()
-	if M.new_user(collect, user_id): 
+	if M.new_user(db, user_id): 
 		print("new user coming!")
 		send.hello_to_new_user(user_id)
 		

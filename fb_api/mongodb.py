@@ -15,11 +15,15 @@ def open_connection():
 def close_connection(client):
 	client.close()
 	
-def new_user(collect, user_id):
+def new_user(db, user_id):
+	collect = db["question_table"]
+	init_question = collect.find_one({"handle_code":"WEATHER"})["question_num"]
+	
+	collect = db[TABLE_NAME]
 	if collect.find_one({'id':user_id})== None:
 		data = {"id": user_id,
 				"state": "default",
-				"question_num": 151,
+				"question_num": init_question,
 				"subscription" : {}
 			}
 		collect.insert_one(data)
@@ -45,6 +49,10 @@ def save_space(collect, user_id, space):
 	now_time = datetime.now()
 	collect.find_one_and_update({'id':user_id},{'$set': {'space':space, 'space_time':now_time }})
 
+def save_time(collect, user_id, time):
+	now_time = datetime.now()
+	collect.find_one_and_update({'id':user_id},{'$set': {'time':time, 'time_time':now_time }})
+	
 def check_space(collect, user_id):
 	data = collect.find_one({'id':user_id})
 	if data.get("space"):
@@ -52,6 +60,18 @@ def check_space(collect, user_id):
 		ten_mins = DT.timedelta( minutes=10 )
 		if now_time - data["space_time"] < ten_mins:
 			return data["space"]
+		else:
+			return None
+	else:
+		return None
+		
+def check_time(collect, user_id):
+	data = collect.find_one({'id':user_id})
+	if data.get("time"):
+		now_time = datetime.now()
+		ten_mins = DT.timedelta( minutes=10 )
+		if now_time - data["time_time"] < ten_mins:
+			return data["time"]
 		else:
 			return None
 	else:
@@ -140,6 +160,11 @@ def save_pushed_user(db, pushed_user_list):
 			if R == None:
 				db.subscription_pushed_user.insert(user) 
 
+def Test():
+	client,db,collect = open_connection()
+	new_user(db, user_id)		
+	close_connection(client)
 	
 if __name__ == '__main__':
 	Test()
+	

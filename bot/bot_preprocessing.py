@@ -73,7 +73,10 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
 	for i in range(len(question_set)):
 		words = jieba.analyse.extract_tags(question_set[i], topK=topK, withWeight=withWeight, allowPOS=allowPOS)
 		keyword_set.append(words)
-		num_of_keyword.append(len(words))
+		if len(words) == 0:
+			num_of_keyword.append(1)
+		else:
+			num_of_keyword.append(len(words))
 		keywords.extend(words)
 	# print(keywords)
 	# print(keyword_set)
@@ -180,7 +183,7 @@ def i_data_init(i_start_num, i_filename):
 	
 	return i_keywords,i_question_list,i_answer_list
 		
-		
+
 	
 if __name__ == '__main__':
 	### Init QA from file
@@ -337,3 +340,10 @@ if __name__ == '__main__':
 	print("[button_table]")
 	for post in collect.find():
 		print (post)
+		
+		
+	###save init_num
+	collect = db["question_table"]
+	init_question = collect.find_one({"handle_code":"WEATHER"})["question_num"]
+	collect = db["user_information"]
+	result = collect.update_many({}, { "$set": { "question_num": init_question } })
