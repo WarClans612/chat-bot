@@ -52,7 +52,7 @@ def get_quick_reply(user_id,payload):
 	M.close_connection(mongo_client)
 	
 def get_text(user_id,text):
-	print("{} says {}".format(user_id,text))
+	#print("{} says {}".format(user_id,text))
 
 	mongo_client, db, collect = M.open_connection()
 	if M.new_user(db, user_id): 
@@ -105,7 +105,7 @@ def get_text(user_id,text):
 			send.send_sQA_answer(user_id,answer,button_list)
 		elif type == "time":
 			space = M.check_space(collect, user_id) 
-			if space == None:
+			if space != None:
 				slots["space"] = space
 				last_q_num = M.get_data(collect, user_id, "question_num")
 				answer = process.sQA_get_answer(last_q_num,slots)
@@ -216,5 +216,6 @@ def get_location(user_id,location):
 		answer = process.sQA_location_get_answer(last_q_num,slots,location)
 		button_list = M.get_subscribe_button_list(db,user_id,last_q_num)
 		send.send_sQA_answer(user_id,answer,button_list)
+		M.set_state(collect, user_id, "default")
 	
 	M.close_connection(mongo_client)

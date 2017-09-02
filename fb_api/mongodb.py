@@ -93,7 +93,9 @@ def get_subscribe_status(collect,user_id,handle_code):
 		return "not_asked_yet"
 		
 def get_subscribe_space(collect,user_id,handle_code):
-	subscribe_status = collect.find_one({'id':user_id})['subscription']
+	item = collect.find_one({'id':user_id})
+	print(item)
+	subscribe_status = item['subscription']
 	if subscribe_status.get(handle_code):
 		space = subscribe_status[handle_code+"_space"]
 		return space
