@@ -12,6 +12,7 @@ from sensor_fetch import get_pm25 as pm25
 from sensor_fetch import get_weather as weather
 from sensor_fetch import get_uvi as UVI
 from sensor_fetch import get_most
+from sensor_fetch import get_where
 from datetime import datetime #datetime.datetime
 import urllib.request
 import urllib.parse
@@ -394,26 +395,70 @@ def sensor_handler_for_subscription(handle_code,slots):
 
 	return answer
 
-def i_handler(question_num,handle_code,HL):
-	values,space = get_most.get_most(handle_code,HL)
-	
-	###connect to DB:"bot"
-	db_url = bot_config.db_url 
-	db_name = bot_config.db_name
-	client = MongoClient(db_url)
-	db = client[db_name]
-	answer = db.answer_table.find_one({'question_num':question_num})['answer']
-	
-	temperature = values["temperature"]
-	air_quality = values["pm25"]
-	uvi = values["uvi"]
-	
-	replace_mapping = {"#temperature#" : temperature , "#pm25#" : air_quality , "#uvi#" : uvi}
-	for pattern in replace_mapping :
-		if re.search(pattern, answer) != None:
-			answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
-	answer = re.sub("#space#", space, answer)
-	return answer
+def i_handler(question_num,handle_code,HL,slots):
+	if handle_code == "RAINBOW":
+		if slots.get("time"):
+			if slots["time"] == "now":
+				time = "目前"
+			else:
+				time = "明天"
+		else:
+			time = "目前"
+			slots["time"] = "now"
+			
+		if slots.get("space"):
+			result, wx = get_where.if_rainbow(slots)
+			if result == True:
+				answer = slots["space"]+time+"天氣"+wx+" 有機會看到彩虹喔!"
+			else:
+				answer = slots["space"]+time+"天氣"+wx+" 不太有機會看到彩虹"
+			return answer
+		else:
+			county_list = get_where.get_where_rainbow(slots)
+			num = len(county_list)
+			if num == 0:
+				answer = "下雨過後出太陽才能看到彩虹 "+time+"各地都沒什麼機會看到彩紅耶,好可惜"
+			elif num == 1:
+				answer = time+"只有"+county_list[0]+"有機會看到喔!"
+			else:
+				answer = time+"在"+",".join(county_list)+"都有機會看到,祝你幸運~"
+			return answer
+	elif handle_code == "SUNRISE":
+		if slots.get("space"):
+			result, wx = get_where.if_sunrise(slots)
+			if result == True:
+				answer = slots["space"]+"明天清晨天氣"+wx+" 有機會看到日出喔!"
+			else:
+				answer = slots["space"]+"明天清晨天氣"+wx+" 不太有機會看到日出"
+		else:
+			recommend_list, county_list = get_where.get_where_sunrise()
+			if len(recommend_list) != 0:
+				answer = "推薦可以到"+"、".join(recommend_list)+"欣賞日出,明天清晨天氣不錯"
+			elif len(county_list) !=0:
+				answer = "明天清晨天氣較佳有機會欣賞日出的縣市如下:"+"、".join(county_list)+" 祝您有個愉快的一天"
+			else:
+				answer = "明天清晨全臺天氣都不佳，可能比較沒有機會看到日出喔"
+		return answer
+	else:
+		values,space = get_most.get_most(handle_code,HL)
+		
+		###connect to DB:"bot"
+		db_url = bot_config.db_url 
+		db_name = bot_config.db_name
+		client = MongoClient(db_url)
+		db = client[db_name]
+		answer = db.answer_table.find_one({'question_num':question_num})['answer']
+		
+		temperature = values["temperature"]
+		air_quality = values["pm25"]
+		uvi = values["uvi"]
+		
+		replace_mapping = {"#temperature#" : temperature , "#pm25#" : air_quality , "#uvi#" : uvi}
+		for pattern in replace_mapping :
+			if re.search(pattern, answer) != None:
+				answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
+		answer = re.sub("#space#", space, answer)
+		return answer
 	
 def get_answer(question_num,slots):
 	###connect to DB:"bot"
@@ -426,7 +471,7 @@ def get_answer(question_num,slots):
 	
 	if type == "i":
 		HL = db.question_table.find_one({'question_num':question_num})['HL_code']
-		answer = i_handler(question_num,handle_code,HL)
+		answer = i_handler(question_num,handle_code,HL,slots)
 	elif type == "general" : #general QA
 		answer = db.answer_table.find_one({'question_num':question_num})['answer']
 	else : #sensor related QA

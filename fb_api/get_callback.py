@@ -64,6 +64,7 @@ def get_text(user_id,text):
 	
 	if state == "default":
 		type, question_num, slots = process.QA(text)
+		print("[slots]",slots)
 		
 		if slots.get("time"):
 			M.save_time(collect, user_id, slots["time"])
@@ -74,7 +75,7 @@ def get_text(user_id,text):
 			
 		print("{}'s type is {}".format(user_id,type))
 		if type == "iQA":
-			answer = process.iQA_get_answer(question_num)
+			answer = process.iQA_get_answer(question_num,slots)
 			send.send_text(user_id, answer)
 		elif type == "gQA":	
 			answer = process.gQA_get_answer(question_num)

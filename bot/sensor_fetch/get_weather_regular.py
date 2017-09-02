@@ -49,6 +49,7 @@ def grab_data():
 			data['startTime'] = time - DT.timedelta(hours=12)
 			data['temperature'] = ( int(item['MaxT']) + int(item['MinT']) )/2
 			data['rainfull_prob'] = int(item['PoP'])
+			data['Wx'] = item['Wx']
 			new_data_list.append(data)
 	#print(new_data_list[0])
 	
@@ -58,7 +59,7 @@ def grab_data():
 	db = client['bot']
 	collect = db['weather_data']
 	for data in new_data_list:
-		upflag = collect.find_one_and_update({'endTime':data['endTime'],"locationName":data['locationName']}, { '$set' : { "temperature": data['temperature'], "rainfull_prob": data['rainfull_prob']}  }  )
+		upflag = collect.find_one_and_update({'endTime':data['endTime'],"locationName":data['locationName']}, { '$set' : { "temperature": data['temperature'], "rainfull_prob": data['rainfull_prob'], "Wx": data['Wx']}  }  )
 		if upflag == None:
 			collect.insert_one(data)
 	return data_list

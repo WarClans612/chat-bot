@@ -60,8 +60,8 @@ def sQA_get_answer(question_num,slots):
 	answer = bot.get_answer(question_num,slots.copy())
 	return answer
 	
-def iQA_get_answer(question_num):
-	answer = bot.get_answer(question_num,{})
+def iQA_get_answer(question_num,slots): 
+	answer = bot.get_answer(question_num,slots)
 	return answer
 	
 def sQA_location_get_answer(question_num,slots,location):

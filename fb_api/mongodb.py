@@ -69,8 +69,8 @@ def check_time(collect, user_id):
 	data = collect.find_one({'id':user_id})
 	if data.get("time"):
 		now_time = datetime.now()
-		ten_mins = DT.timedelta( minutes=10 )
-		if now_time - data["time_time"] < ten_mins:
+		three_mins = DT.timedelta( minutes=3 )
+		if now_time - data["time_time"] < three_mins:
 			return data["time"]
 		else:
 			return None

@@ -26,7 +26,7 @@ def get_weather(Location_name,time):
 		next_day = now_day + DT.timedelta(days=1)
 		time_we_want = next_day
 	
-	item = collect.find_one({'endTime': {'$gt': now_time},'startTime': {'$lt': now_time},'locationName':Location_name})
+	item = collect.find_one({'endTime': {'$gt': time_we_want},'startTime': {'$lt': time_we_want},'locationName':Location_name})
 	if item == None:
 		get_weather_regular.grab_data()
 		item = collect.find_one({'endTime': {'$gt': time_we_want},'startTime': {'$lt': time_we_want},'locationName':Location_name})
