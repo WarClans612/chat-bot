@@ -11,6 +11,7 @@ import re
 from sensor_fetch import get_pm25 as pm25
 from sensor_fetch import get_weather as weather
 from sensor_fetch import get_uvi as UVI
+from sensor_fetch import get_rainfall as RAINF
 from sensor_fetch import get_most
 from sensor_fetch import get_where
 from datetime import datetime #datetime.datetime
@@ -108,6 +109,7 @@ def sensor_handler(handle_code,slots):
 	temperature_bound = [20,30]
 	air_quality_bound = [10,15,25,35]
 	uvi_bound = [6,8,11]
+	rainfall_bound = [80,200,350,500]
 	temperature = 0
 	rainfull_prob = 0
 	air_quality = 0
@@ -220,6 +222,18 @@ def sensor_handler(handle_code,slots):
 			answer_code = 3
 		else:
 			answer_code = 4
+	elif handle_code == "RAINFALL":
+		rainfall1hr, rainfall24hr = get_rainfall(slots)
+		if rainfall24hr < rainfall_bound[0] and rainfall1hr < 40:
+			answer_code = 1
+		elif rainfall24hr < rainfall_bound[1]:
+			answer_code = 2
+		elif rainfall24hr < rainfall_bound[2]:
+			answer_code = 3
+		elif rainfall24hr < rainfall_bound[3]:
+			answer_code = 4
+		else:
+			answer_code = 5
 	else: 
 		print("[err: no such handle_code -- ",handle_code," ]")
 		
@@ -229,8 +243,8 @@ def sensor_handler(handle_code,slots):
 	client = MongoClient(db_url)
 	db = client[db_name]
 	A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
-	answer = A_template
-	replace_mapping = {"#temperature#" : temperature , "#rainfull_prob#" : rainfull_prob , "#pm25#" : air_quality , "#uvi#" : uvi}
+	answer = A_template 
+	replace_mapping = {"#temperature#" : temperature , "#rainfull_prob#" : rainfull_prob , "#pm25#" : air_quality , "#uvi#" : uvi, "#rainfall1hr#" : rainfall1hr , "#rainfall24hr#" : rainfall24hr}
 	for pattern in replace_mapping :
 		if re.search(pattern, A_template) != None:
 			answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
@@ -452,8 +466,9 @@ def i_handler(question_num,handle_code,HL,slots):
 		temperature = values["temperature"]
 		air_quality = values["pm25"]
 		uvi = values["uvi"]
+		rainfall24hr = values["rainfall24hr"]
 		
-		replace_mapping = {"#temperature#" : temperature , "#pm25#" : air_quality , "#uvi#" : uvi}
+		replace_mapping = {"#temperature#" : temperature , "#pm25#" : air_quality , "#uvi#" : uvi, "#rainfall24hr#" : rainfall24hr}
 		for pattern in replace_mapping :
 			if re.search(pattern, answer) != None:
 				answer = re.sub(pattern, str(replace_mapping[pattern]), answer)
@@ -565,6 +580,11 @@ def get_uvi(slots):
 	else:
 		uvi = UVI.get_uvi(slots["space"])
 	return float(uvi)
+	
+def get_rainfall(slots):
+	if slots.get("space"):
+		rainfall1hr, rainfall24hr = RAINF.get_rainfall(slots["space"])
+	return rainfall1hr, rainfall24hr
 	
 def get_slots(words):
 	slots = {}

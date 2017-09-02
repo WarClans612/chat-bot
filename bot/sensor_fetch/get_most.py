@@ -5,7 +5,7 @@ from datetime import datetime
 import pymongo
 from pymongo import MongoClient
 import get_pm25_regular
-table_mapping = {"PM25": "pm25_data","temperature": "weather_data", "UVI": "uvi_data"}
+table_mapping = {"PM25": "pm25_data","temperature": "weather_data", "UVI": "uvi_data", "RAINFALL": "rainfall_data"}
 
 def get_most(handle_code,HL):
 	db_url = "127.0.0.1:27017"
@@ -17,6 +17,7 @@ def get_most(handle_code,HL):
 	values["pm25"] = 0
 	values["uvi"] = 0
 	values["temperature"] = 0
+	values["rainfall24hr"] = 0
 	
 	if HL == "H":
 		sort_code = -1
@@ -31,6 +32,10 @@ def get_most(handle_code,HL):
 		data_list = collect.find().sort([("PublishTime",-1),("UVI",sort_code)])
 		space = data_list[0]["County"]
 		values["uvi"] = data_list[0]["UVI"]
+	elif handle_code == "RAINFALL":
+		data_list = collect.find().sort([("PublishTime",-1),("rainfall24hr",sort_code)])
+		space = data_list[0]["County"]
+		values["rainfall24hr"] = data_list[0]["rainfall24hr"]
 	else: #temperature
 		now_time = datetime.now()
 		data_list = collect.find({'endTime': {'$gt': now_time},'startTime': {'$lt': now_time}}).sort([("PublishTime",-1),("temperature",sort_code)])

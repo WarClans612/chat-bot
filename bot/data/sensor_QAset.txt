@@ -145,5 +145,26 @@
 			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=UVI_" }
 		],
 	"H": "UVI"
+},
+{ 
+	"Q":
+		[
+			"雨量",
+			"降雨量",
+			"雨量多少",
+			"累積雨量多少",
+			"降雨量多少",
+			"累積雨量"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm" },
+			{ "answer_code": 2, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達大雨標準" },
+			{ "answer_code": 3, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達豪雨標準，若出門請小心安全" },
+			{ "answer_code": 4, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達大豪雨標準，請盡量不要出門" },
+			{ "answer_code": 5, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達超大豪雨標準，外出很危險!" }
+		],
+	"B":[
+		],
+	"H": "RAINFALL"
 }
 ]
