@@ -54,7 +54,7 @@ def push_notice(handle_code,user_list,pushed_user_id_list):
 	
 	
 if __name__ == "__main__" :
-	handle_list = handle_list = ["PM25","UVI"]
+	handle_list = ["PM25","UVI"]
 	for handle_code in handle_list:
 		pushed_user_id_list = get_pushed_user(handle_code)
 		user_list = get_users(handle_code)

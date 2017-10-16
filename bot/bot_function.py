@@ -114,6 +114,8 @@ def sensor_handler(handle_code,slots):
 	rainfull_prob = 0
 	air_quality = 0
 	uvi = 0
+	rainfall1hr = 0
+	rainfall24hr = 0
 	if handle_code == "WEATHER" :
 		temperature, rainfull_prob = get_weather(slots)
 		if rainfull_prob < rain_bound[0]:

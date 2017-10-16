@@ -7,6 +7,10 @@ DEBUG = False
 
 app = Flask(__name__)
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return "ERROR"
+
 @app.route('/')
 def index():
 	fw = open('tmp.txt','w')

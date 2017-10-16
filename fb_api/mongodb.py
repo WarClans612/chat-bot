@@ -57,7 +57,7 @@ def check_space(collect, user_id):
 	data = collect.find_one({'id':user_id})
 	if data.get("space"):
 		now_time = datetime.now()
-		ten_mins = DT.timedelta( minutes=10 )
+		ten_mins = DT.timedelta( days=30 )
 		if now_time - data["space_time"] < ten_mins:
 			return data["space"]
 		else:
@@ -139,6 +139,17 @@ def find_user_subscribed(collect, sub_tag):
 	user_list = []
 	if data != None:
 		for i in data:
+			user = i["id"]
+			user_list.append(user)
+	
+	return user_list
+	
+def find_user_cancel_subscribed(collect, sub_tag):
+	data = collect.find( { 'subscription.'+sub_tag+"_space" : { '$exists' :True } , 'subscription.'+sub_tag : { '$exists' :True , '$in': [False] } }  )
+	user_list = []
+	if data != None:
+		for i in data:
+			#print(i)
 			user = i["id"]
 			user_list.append(user)
 	
