@@ -5,12 +5,9 @@ from pymongo import MongoClient
 from sensor_config import *
 
 def grab_data():
-
-#connect to cwb api
-    urll = 'http://opendata2.epa.gov.tw/AQI.json'
-    fp = urllib.request.urlopen(urll)
-    data_list = json.loads(fp.read().decode('utf-8'))
-    fp.close()
+    url = 'http://opendata2.epa.gov.tw/AQI.json'
+    with urllib.request.urlopen(url) as response:
+        data_list = json.loads(response.read().decode('utf-8'))
 
     return data_list
 
