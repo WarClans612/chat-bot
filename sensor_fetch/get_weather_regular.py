@@ -23,14 +23,12 @@ def parse_json_data(pure_data):
 
 def grab_data():
 	Data_set = "F-C0032-001"
-#connect to cwb api
-	urll = 'http://opendata.cwb.gov.tw/api/v1/rest/datastore/'+Data_set+'?'
-	target_url = urllib.request.Request(urll+'sort=time')
+	url = 'http://opendata.cwb.gov.tw/api/v1/rest/datastore/{Data_set}?sort=time'.format(Data_set=Data_set)
+	request = urllib.request.Request(url)
 
-	target_url.add_header( 'Authorization' , weather_token)
-	fp = urllib.request.urlopen(target_url)
-	pure_data = json.loads(fp.read().decode('utf-8'))
-	fp.close()
+	request.add_header( 'Authorization' , weather_token)
+        with urllib.request.urlopen(request) as response:
+            pure_data = json.loads(response.read().decode('utf-8'))
 	
 	data_list = parse_json_data(pure_data)
 	
