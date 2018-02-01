@@ -5,10 +5,9 @@ from pymongo import MongoClient
 from sensor_config import *
 
 def grab_data():
-    urll = 'http://opendata.epa.gov.tw/ws/Data/RainTenMin/?format=json'
-    fp = urllib.request.urlopen(urll)
-    data_list = json.loads(fp.read().decode('utf-8'))
-    fp.close()
+    url = 'http://opendata.epa.gov.tw/ws/Data/RainTenMin/?format=json'
+    with urllib.request.urlopen(url) as response:
+        data_list = json.loads(response.read().decode('utf-8'))
     
     return data_list
 
