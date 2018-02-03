@@ -7,34 +7,29 @@ from sensor_config import *
 def grab_data():
     url = 'http://opendata2.epa.gov.tw/AQI.json'
     with urllib.request.urlopen(url) as response:
-        data_list = json.loads(response.read().decode('utf-8'))
-
-    return data_list
+        raw_data = json.loads(response.read().decode('utf-8'))
+    return raw_data
 
 def save_pm25():
-    data_list = grab_data()
-    new_data_list = []
-    for i in data_list:
-        time = datetime.strptime(i['PublishTime'], "%Y-%m-%d %H:%M")
-        data = {}
-        data['County'] = i['County']
-        if i['PM2.5'] == "ND" or i['PM2.5'] == "":
+    raw_data = grab_data()
+    pm25_data = []
+    for item in raw_data:
+        data = dict()
+        if item['PM2.5'] in ["ND",""]:
             data['PM25'] = 0
         else:
-            data['PM25'] = int(i['PM2.5'])
-        print(data['PM25'])
-        data['PublishTime'] = time
-        data['SiteName'] = i['SiteName']
-        new_data_list.append(data)
+            data['PM25'] = int(item['PM2.5'])
+        data['County'] = item['County']
+        data['PublishTime'] = datetime.strptime(item['PublishTime'], "%Y-%m-%d %H:%M")
+        data['SiteName'] = item['SiteName']
+        pm25_data.append(data)
     
     db_url = "{host}:27017".format(host=mongo_host)
     db_name = 'bot'
     client = MongoClient(db_url,  27017)
     db = client[ 'bot']
     collect = db['pm25_data']
-    collect.insert(new_data_list)
-    
-    return time
+    collect.insert(pm25_data)
     
 if __name__ == "__main__":
     save_pm25()
