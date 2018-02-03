@@ -7,35 +7,26 @@ from sensor_config import *
 def grab_data():
     url = 'http://opendata.epa.gov.tw/ws/Data/RainTenMin/?format=json'
     with urllib.request.urlopen(url) as response:
-        data_list = json.loads(response.read().decode('utf-8'))
-    
-    return data_list
+        raw_data = json.loads(response.read().decode('utf-8'))
+    return raw_data
 
 def save_rainfall():
-    county_list = []
-    data_list = grab_data()
-    new_data_list = []
-    for i in data_list:
-        county = i['County']   
-        if county not in county_list:
-            county_list.append(county)
-            data = {}  
-            time = datetime.strptime(i['PublishTime'], "%Y-%m-%d %H:%M:%S")
-            data['County'] = county
-            data['rainfall1hr'] = float(i['Rainfall1hr'])
-            data['rainfall24hr'] = float(i['Rainfall24hr'])
-            data['PublishTime'] = time
-            print(data)
-            new_data_list.append(data)
+    raw_data = grab_data()
+    rainfall_data = []
+    for item in raw_data:
+        data = dict()
+        data['County'] = item['County']
+        data['rainfall1hr'] = float(item['Rainfall1hr'])
+        data['rainfall24hr'] = float(item['Rainfall24hr'])
+        data['PublishTime'] = datetime.strptime(item['PublishTime'], "%Y-%m-%d %H:%M:%S")
+        rainfall_data.append(data)
     
     db_url = "{host}:27017".format(host=mongo_host)
     db_name = 'bot'
     client = MongoClient(db_url,  27017)
     db = client[ 'bot']
     collect = db['rainfall_data']
-    collect.insert(new_data_list)
-    
-    return time
+    collect.insert(rainfall_data)
     
 if __name__ == "__main__":
     save_rainfall()
