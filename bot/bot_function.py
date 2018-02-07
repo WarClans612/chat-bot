@@ -27,8 +27,8 @@ def open_qa_file(filename):
     question_set = []
     answer_set = []
     i = 0
-    with open(filename, 'r', encoding='utf8') as fr:
-        for line in fr:
+    with open(filename, 'r', encoding='utf8') as fp:
+        for line in fp:
             text = line.strip()
             if i % 2 == 0:
                 question_set.append(text)
@@ -45,25 +45,22 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
     num_of_keyword = []
     keywords = []
 
-    for i in range(len(question_set)):
-        words = jieba.analyse.extract_tags(question_set[i], topK=topK, withWeight=withWeight, allowPOS=allowPOS)
+    for question in question_set:
+        words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
         keyword_set.append(words)
         num_of_keyword.append(len(words))
         keywords.extend(words)
-    # print(keywords)
-    # print(keyword_set)
 
     return keywords, keyword_set, num_of_keyword
-    
 
-def qa_questoining(source, file_questioning):
+def qa_questoining(source, question_file):
     questions = []
     if source=='input':
         text = input("==>")
         questions.append(text)
     elif source=='file':
-        with open(file_questioning, 'r', encoding='utf8') as fr:
-            for line in fr:
+        with open(question_file, 'r', encoding='utf8') as fp:
+            for line in fp:
                 text = line.strip()
                 questions.append(text)
     else:
@@ -628,8 +625,8 @@ if __name__ == '__main__':
     #source from file
     """
     source = 'file'
-    file_questioning = '課程抵免_questions.txt'
-    questions = qa_questoining(source, file_questioning)
+    question_file = '課程抵免_questions.txt'
+    questions = qa_questoining(source, question_file)
     for q in questions:
         a = qa_answering(q, answer_set, keyword_set)
         print(q)
@@ -638,9 +635,9 @@ if __name__ == '__main__':
     """
     #source from input
     source = 'input'
-    file_questioning = ''
+    question_file = ''
     while 1==1:
-        questions = qa_questoining(source, file_questioning)
+        questions = qa_questoining(source, question_file)
         q = questions[0]
         a = qa_answering(q, answer_set, keyword_set)
         print('Q: '+q)
