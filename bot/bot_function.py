@@ -527,30 +527,26 @@ def nearest_station(handle_code, location):
     
     first = station_list[0]
     SiteName = first["SiteName"]
-    min_D = distence(user_lon, user_lat, first["Lon"], first["Lat"])
+    min_D = haversine(user_lon, user_lat, first["Lon"], first["Lat"])
     for station in station_list:
-        D = distence(user_lon, user_lat, station["Lon"], station["Lat"])
+        D = haversine(user_lon, user_lat, station["Lon"], station["Lat"])
         if D < min_D:
             min_D = D
             SiteName = station["SiteName"]
     return SiteName
     
-def distence(lon1, lat1, lon2, lat2):
-    #计算距离 
-    from math import radians, cos, sin, asin, sqrt  
+def haversine(lon1, lat1, lon2, lat2):
+    from math import radians, cos, sin, asin, sqrt
 
-    # 将十进制度数转化为弧度  
-    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])  
+    lon1, lat1, lon2, lat2 = map(radians, [lon1, lat1, lon2, lat2])
 
-    # haversine公式  
-    dlon = lon2 - lon1   
-    dlat = lat2 - lat1   
-    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2  
-    c = 2 * asin(sqrt(a))   
-    r = 6371 # 地球平均半径，单位为公里  
-    return int(c * r) 
-    
-    
+    dlon = lon2 - lon1
+    dlat = lat2 - lat1
+    a = sin(dlat/2)**2 + cos(lat1) * cos(lat2) * sin(dlon/2)**2
+    c = 2 * asin(sqrt(a))
+    r = 6371
+    return int(c * r)
+
 def get_weather(slots):
     if "space" not in slots:
         slots["space"] = "新竹市"
