@@ -98,7 +98,20 @@ def segment(question):
         data_list = res.read().decode('utf-8')
     words = data_list.split("/")
     return words
-        
+
+def get_uvi_answer_code(slots):
+    uvi_bound = [6,8,11]
+    uvi = get_uvi(slots)
+    if uvi < uvi_bound[0]:
+        answer_code = 1
+    elif uvi < uvi_bound[1]:
+        answer_code = 2
+    elif uvi < uvi_bound[2]:
+        answer_code = 3
+    else:
+        answer_code = 4
+    return uvi, answer_code
+
 def sensor_handler(handle_code,slots):
     rain_bound = [20]
     temperature_bound = [20,30]
@@ -210,15 +223,7 @@ def sensor_handler(handle_code,slots):
                     else:
                         answer_code = 24
     elif handle_code == "UVI":
-        uvi = get_uvi(slots)
-        if uvi < uvi_bound[0]:
-            answer_code = 1
-        elif uvi < uvi_bound[1]:
-            answer_code = 2
-        elif uvi < uvi_bound[2]:
-            answer_code = 3
-        else:
-            answer_code = 4
+        uvi, answer_code = get_uvi_answer_code(slots)
     elif handle_code == "RAINFALL":
         rainfall1hr, rainfall24hr = get_rainfall(slots)
         if rainfall24hr < rainfall_bound[0] and rainfall1hr < 40:
@@ -364,15 +369,7 @@ def sensor_handler_for_subscription(handle_code,slots):
                     else:
                         answer_code = 24
     elif handle_code == "UVI":
-        uvi = get_uvi(slots)
-        if uvi < uvi_bound[0]:
-            answer_code = 1
-        elif uvi < uvi_bound[1]:
-            answer_code = 2
-        elif uvi < uvi_bound[2]:
-            answer_code = 3
-        else:
-            answer_code = 4
+        uvi, answer_code = get_uvi_answer_code(slots)
     else: 
         print("[err: no such handle_code -- ",handle_code," ]")
         
