@@ -92,12 +92,10 @@ def qa_answering(sentence, answer_db, keyword_set_db):
         
         
 def segment(question):
-    #words = jieba.analyse.extract_tags(question, topK=topK, withWeight=withWeight, allowPOS=allowPOS)
-    urll = bot_config.segment_api_url
-    target_url = urllib.request.Request(urll+ urllib.parse.quote(question.strip(), safe=''))
-    fp = urllib.request.urlopen(target_url)
-    data_list = fp.read().decode('utf-8')
-    fp.close()
+    url = bot_config.segment_api_url
+    target_url = urllib.request.Request(url+ urllib.parse.quote(question.strip(), safe=''))
+    with urllib.request.urlopen(target_url) as res:
+        data_list = res.read().decode('utf-8')
     words = data_list.split("/")
     return words
         
