@@ -585,27 +585,26 @@ def get_rainfall(slots):
     
 def get_slots(words):
     slots = {}
-    rest_words = []
-    rest_words.extend(words)
+    rest_words = list(words)
     country_name = ['宜蘭縣', '花蓮縣', '臺東縣', '澎湖縣', '金門縣', '連江縣', '臺北市', '新北市', '桃園市', '臺中市', '臺南市', '高雄市', '基隆市', '新竹縣', '新竹市', '苗栗縣', '彰化縣', '南投縣', '雲林縣', '嘉義縣', '嘉義市', '屏東縣']
     country_nickname = ['宜蘭', '花蓮', '臺東', '台東', '台東縣', '澎湖', '金門', '連江', '臺北', '台北', '台北市', '新北', '桃園', '臺中', '台中', '台中市', '臺南', '台南', '台南市', '高雄', '基隆', '新竹', '苗栗', '彰化', '南投', '雲林', '嘉義', '屏東', '馬祖']
     mapping = {'台東縣': '臺東縣', '基隆': '基隆市', '臺南': '臺南市', '新北': '新北市', '台北市': '臺北市', '台中': '臺中市', '馬祖': '連江', '台中市': '臺中市', '台南市': '臺南市', '台北': '臺北市', '金門': '金門縣', '澎湖': '澎湖縣', '台東': '臺東縣', '桃園': '桃園市', '苗栗': '苗栗縣', '臺東': '臺東縣', '臺北': '臺北市', '臺中': '臺中市', '連江': '連江縣', '屏東': '屏東縣', '彰化': '彰化縣', '新竹': '新竹市', '花蓮': '花蓮縣', '高雄': '高雄市', '嘉義': '嘉義市', '南投': '南投縣', '宜蘭': '宜蘭縣', '台南': '臺南市', '雲林': '雲林縣'}
     time_name = ['今天','現在','明天']
-    for i in words:
-        if i in country_name:
-            slots["space"] = i
-            rest_words.remove(i)
-        if i in country_nickname:
-            slots["space"] = mapping[i]
-            rest_words.remove(i)
-    for i in words:
-        if i in time_name:
-            if i in ['今天','現在']:
+    for word in words:
+        if word in country_name:
+            slots["space"] = word
+            rest_words.remove(word)
+        if word in country_nickname:
+            slots["space"] = mapping[word]
+            rest_words.remove(word)
+    for word in words:
+        if word in time_name:
+            if word in ['今天','現在']:
                 slots['time'] = 'now'
-                rest_words.remove(i)
-            elif i in ['明天']:
+                rest_words.remove(word)
+            elif word in ['明天']:
                 slots['time'] = 'next'
-                rest_words.remove(i)
+                rest_words.remove(word)
     return slots, rest_words
     
 if __name__ == '__main__':
