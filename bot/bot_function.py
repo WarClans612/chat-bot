@@ -99,6 +99,26 @@ def segment(question):
     words = data_list.split("/")
     return words
 
+def get_weather_answer_code(slots):
+    rain_bound = [20]
+    temperature_bound = [20,30]
+    temperature, rainfull_prob = get_weather(slots)
+    if rainfull_prob < rain_bound[0]:
+        if temperature < temperature_bound[0]:
+            answer_code = 1
+        elif temperature < temperature_bound[1]:
+            answer_code = 2
+        else:
+            answer_code = 3
+    else:
+        if temperature < temperature_bound[0]:
+            answer_code = 4
+        elif temperature < temperature_bound[1]:
+            answer_code = 5
+        else:
+            answer_code = 6
+    return temperature, rainfull_prob, answer_code
+
 def get_uvi_answer_code(slots):
     uvi_bound = [6,8,11]
     uvi = get_uvi(slots)
@@ -125,21 +145,7 @@ def sensor_handler(handle_code,slots):
     rainfall1hr = 0
     rainfall24hr = 0
     if handle_code == "WEATHER" :
-        temperature, rainfull_prob = get_weather(slots)
-        if rainfull_prob < rain_bound[0]:
-            if temperature < temperature_bound[0]:
-                answer_code = 1
-            elif temperature < temperature_bound[1]:
-                answer_code = 2
-            else:
-                answer_code = 3
-        else:
-            if temperature < temperature_bound[0]:
-                answer_code = 4
-            elif temperature < temperature_bound[1]:
-                answer_code = 5
-            else:
-                answer_code = 6
+        temperature, rainfull_prob, answer_code = get_weather_answer_code(slots)
     elif handle_code == "RAIN":
         temperature, rainfull_prob = get_weather(slots)
         if rainfull_prob < rain_bound[0]:
@@ -271,21 +277,7 @@ def sensor_handler_for_subscription(handle_code,slots):
     air_quality = 0
     uvi = 0
     if handle_code == "WEATHER" :
-        temperature, rainfull_prob = get_weather(slots)
-        if rainfull_prob < rain_bound[0]:
-            if temperature < temperature_bound[0]:
-                answer_code = 1
-            elif temperature < temperature_bound[1]:
-                answer_code = 2
-            else:
-                answer_code = 3
-        else:
-            if temperature < temperature_bound[0]:
-                answer_code = 4
-            elif temperature < temperature_bound[1]:
-                answer_code = 5
-            else:
-                answer_code = 6
+        temperature, rainfull_prob, answer_code = get_weather_answer_code(slots)
     elif handle_code == "RAIN":
         temperature, rainfull_prob = get_weather(slots)
         if rainfull_prob < rain_bound[0]:
