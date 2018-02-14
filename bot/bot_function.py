@@ -132,6 +132,78 @@ def get_pm25_answer_code(slots):
         answer_code = 4
     return air_quality, answer_code
 
+def get_goout_answer_code(slots):
+    rain_bound = [20]
+    temperature_bound = [20,30]
+    air_quality_bound = [10,15,25,35]
+    uvi_bound = [6,8,11]
+    air_quality = get_air_quality(slots)
+    temperature, rainfull_prob = get_weather(slots)
+    uvi = get_uvi(slots)
+    if uvi < uvi_bound[1]:
+        if air_quality < air_quality_bound[1]:
+            if rainfull_prob < rain_bound[0]:
+                if temperature < temperature_bound[0]:
+                    answer_code = 1
+                elif temperature < temperature_bound[1]:
+                    answer_code = 2
+                else:
+                    answer_code = 3
+            else:
+                if temperature < temperature_bound[0]:
+                    answer_code = 4
+                elif temperature < temperature_bound[1]:
+                    answer_code = 5
+                else:
+                    answer_code = 6
+        else:
+            if rainfull_prob < rain_bound[0]:
+                if temperature < temperature_bound[0]:
+                    answer_code = 7
+                elif temperature < temperature_bound[1]:
+                    answer_code = 8
+                else:
+                    answer_code = 9
+            else:
+                if temperature < temperature_bound[0]:
+                    answer_code = 10
+                elif temperature < temperature_bound[1]:
+                    answer_code = 11
+                else:
+                    answer_code = 12
+    else:
+        if air_quality < air_quality_bound[1]:
+            if rainfull_prob < rain_bound[0]:
+                if temperature < temperature_bound[0]:
+                    answer_code = 13
+                elif temperature < temperature_bound[1]:
+                    answer_code = 14
+                else:
+                    answer_code = 15
+            else:
+                if temperature < temperature_bound[0]:
+                    answer_code = 16
+                elif temperature < temperature_bound[1]:
+                    answer_code = 17
+                else:
+                    answer_code = 18
+        else:
+            if rainfull_prob < rain_bound[0]:
+                if temperature < temperature_bound[0]:
+                    answer_code = 19
+                elif temperature < temperature_bound[1]:
+                    answer_code = 20
+                else:
+                    answer_code = 21
+            else:
+                if temperature < temperature_bound[0]:
+                    answer_code = 22
+                elif temperature < temperature_bound[1]:
+                    answer_code = 23
+                else:
+                    answer_code = 24
+    return air_quality, temperature, rainfull_prob, uvi, answer_code
+
 def get_uvi_answer_code(slots):
     uvi_bound = [6,8,11]
     uvi = get_uvi(slots)
@@ -168,71 +240,7 @@ def sensor_handler(handle_code,slots):
     elif handle_code == "PM25":
         air_quality, answer_code = get_pm25_answer_code(slots)
     elif handle_code == "GOOUT":
-        air_quality = get_air_quality(slots)
-        temperature, rainfull_prob = get_weather(slots)
-        uvi = get_uvi(slots)
-        if uvi < uvi_bound[1]:
-            if air_quality < air_quality_bound[1]:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 1
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 2
-                    else:
-                        answer_code = 3
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 4
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 5
-                    else:
-                        answer_code = 6
-            else:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 7
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 8
-                    else:
-                        answer_code = 9
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 10
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 11
-                    else:
-                        answer_code = 12
-        else:
-            if air_quality < air_quality_bound[1]:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 13
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 14
-                    else:
-                        answer_code = 15
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 16
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 17
-                    else:
-                        answer_code = 18
-            else:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 19
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 20
-                    else:
-                        answer_code = 21
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 22
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 23
-                    else:
-                        answer_code = 24
+        air_quality, temperature, rainfull_prob, uvi, answer_code = get_goout_answer_code(slots)
     elif handle_code == "UVI":
         uvi, answer_code = get_uvi_answer_code(slots)
     elif handle_code == "RAINFALL":
@@ -292,71 +300,7 @@ def sensor_handler_for_subscription(handle_code,slots):
     elif handle_code == "PM25":
         air_quality, answer_code = get_pm25_answer_code(slots)
     elif handle_code == "GOOUT":
-        air_quality = get_air_quality(slots)
-        temperature, rainfull_prob = get_weather(slots)
-        uvi = get_uvi(slots)
-        if uvi < uvi_bound[1]:
-            if air_quality < air_quality_bound[1]:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 1
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 2
-                    else:
-                        answer_code = 3
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 4
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 5
-                    else:
-                        answer_code = 6
-            else:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 7
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 8
-                    else:
-                        answer_code = 9
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 10
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 11
-                    else:
-                        answer_code = 12
-        else:
-            if air_quality < air_quality_bound[1]:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 13
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 14
-                    else:
-                        answer_code = 15
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 16
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 17
-                    else:
-                        answer_code = 18
-            else:
-                if rainfull_prob < rain_bound[0]:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 19
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 20
-                    else:
-                        answer_code = 21
-                else:
-                    if temperature < temperature_bound[0]:
-                        answer_code = 22
-                    elif temperature < temperature_bound[1]:
-                        answer_code = 23
-                    else:
-                        answer_code = 24
+        air_quality, temperature, rainfull_prob, uvi, answer_code = get_goout_answer_code(slots)
     elif handle_code == "UVI":
         uvi, answer_code = get_uvi_answer_code(slots)
     else: 
