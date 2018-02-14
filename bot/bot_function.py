@@ -552,15 +552,13 @@ def distence(lon1, lat1, lon2, lat2):
     
     
 def get_weather(slots):
-    #temperature = 30
-    #rainfull_prob = 50
-    # if "space" not in slots:
-        # slots["space"] = "新竹市"
+    if "space" not in slots:
+        slots["space"] = "新竹市"
     if "time" not in slots:
         slots["time"] = "now"
-    item = weather.get_weather(Location_name = slots["space"], time = slots["time"])
-    temperature = float(item["temperature"])
-    rainfull_prob = int(item["rainfull_prob"])
+    weather_info = weather.get_weather(Location_name = slots["space"], time = slots["time"])
+    temperature = float(weather_info["temperature"])
+    rainfull_prob = int(weather_info["rainfull_prob"])
     return temperature, rainfull_prob
     
 def get_air_quality(slots):
