@@ -128,6 +128,15 @@ def get_weather_answer_code(slots):
             answer_code = 6
     return temperature, rainfull_prob, answer_code
 
+def get_rainfall_prob_answer_code(slots):
+    rain_bound = [20]
+    temperature, rainfull_prob = get_weather(slots)
+    if rainfull_prob < rain_bound[0]:
+        answer_code = 1
+    else:
+        answer_code = 2
+    return temperature, rainfull_prob, answer_code
+
 def get_pm25_answer_code(slots):
     air_quality_bound = [10,15,25,35]
     air_quality = get_air_quality(slots)
@@ -241,11 +250,7 @@ def sensor_handler(handle_code,slots):
     if handle_code == "WEATHER" :
         temperature, rainfull_prob, answer_code = get_weather_answer_code(slots)
     elif handle_code == "RAIN":
-        temperature, rainfull_prob = get_weather(slots)
-        if rainfull_prob < rain_bound[0]:
-            answer_code = 1
-        else:
-            answer_code = 2
+        temperature, rainfull_prob, answer_code = get_rainfall_prob_answer_code(slots)
     elif handle_code == "PM25":
         air_quality, answer_code = get_pm25_answer_code(slots)
     elif handle_code == "GOOUT":
@@ -297,11 +302,7 @@ def sensor_handler_for_subscription(handle_code,slots):
     if handle_code == "WEATHER" :
         temperature, rainfull_prob, answer_code = get_weather_answer_code(slots)
     elif handle_code == "RAIN":
-        temperature, rainfull_prob = get_weather(slots)
-        if rainfull_prob < rain_bound[0]:
-            answer_code = 1
-        else:
-            answer_code = 2
+        temperature, rainfull_prob, answer_code = get_rainfall_prob_answer_code(slots)
     elif handle_code == "PM25":
         air_quality, answer_code = get_pm25_answer_code(slots)
     elif handle_code == "GOOUT":
