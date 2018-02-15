@@ -23,6 +23,13 @@ withWeight = False
 allowPOS = ()
 default_message = "找不到符合的答案"
 
+def connect_to_DB():
+    db_url = bot_config.db_url
+    db_name = bot_config.db_name
+    client = MongoClient(db_url)
+    db = client[db_name]
+    return db
+
 def open_qa_file(filename):
     question_set = []
     answer_set = []
@@ -257,12 +264,8 @@ def sensor_handler(handle_code,slots):
             answer_code = 5
     else: 
         print("[err: no such handle_code -- ",handle_code," ]")
-        
-    ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+
+    db = connect_to_DB()
     A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
     answer = A_template 
     replace_mapping = {"#temperature#" : temperature , "#rainfull_prob#" : rainfull_prob , "#pm25#" : air_quality , "#uvi#" : uvi, "#rainfall1hr#" : rainfall1hr , "#rainfall24hr#" : rainfall24hr}
@@ -305,12 +308,8 @@ def sensor_handler_for_subscription(handle_code,slots):
         uvi, answer_code = get_uvi_answer_code(slots)
     else: 
         print("[err: no such handle_code -- ",handle_code," ]")
-        
-    ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+
+    db = connect_to_DB()
     A_template = db.handle_table.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
     answer = A_template
     replace_mapping = {"#temperature#" : temperature , "#rainfull_prob#" : rainfull_prob , "#pm25#" : air_quality , "#uvi#" : uvi}
@@ -383,11 +382,7 @@ def i_handler(question_num,handle_code,HL,slots):
     else:
         values,space = get_most.get_most(handle_code,HL)
         
-        ###connect to DB:"bot"
-        db_url = bot_config.db_url 
-        db_name = bot_config.db_name
-        client = MongoClient(db_url)
-        db = client[db_name]
+        db = connect_to_DB()
         answer = db.answer_table.find_one({'question_num':question_num})['answer']
         
         temperature = values["temperature"]
@@ -403,11 +398,7 @@ def i_handler(question_num,handle_code,HL,slots):
         return answer
     
 def get_answer(question_num,slots):
-    ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+    db = connect_to_DB()
     handle_code = db.question_table.find_one({'question_num':question_num})['handle_code']
     type = db.question_table.find_one({'question_num':question_num})['type']
     
@@ -421,11 +412,7 @@ def get_answer(question_num,slots):
     return answer
     
 def get_location_sQA_answer(question_num,slots,location):
-    ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+    db = connect_to_DB()
     handle_code = db.question_table.find_one({'question_num':question_num})['handle_code']
     
 
@@ -443,12 +430,8 @@ def get_location_sQA_answer(question_num,slots,location):
 def nearest_station(handle_code, location):
     user_lon = location['long']
     user_lat = location['lat']
-    
-    ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+
+    db = connect_to_DB()
     
     if handle_code == "PM25":
         station_list = db.pm25_station_data.find()
