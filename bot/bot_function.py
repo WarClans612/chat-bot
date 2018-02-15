@@ -1,5 +1,7 @@
 #!/usr/bin/python
-
+"""
+{"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
+"""
 import jieba
 import jieba.analyse
 from pymongo import MongoClient
@@ -415,16 +417,12 @@ def get_location_sQA_answer(question_num,slots,location):
     db = connect_to_DB()
     handle_code = db.question_table.find_one({'question_num':question_num})['handle_code']
     
-
-    if handle_code == "PM25" or handle_code =="UVI":
+    if handle_code in ["PM25","UVI"]:
         slots["SiteName"] = nearest_station(handle_code, location)
-        slots["space"] = "您最接近"+slots["SiteName"]+"測站,"
+        slots["space"] = "您最接近{station}測站,".format(station=slots["SiteName"])
 
     answer = sensor_handler(handle_code,slots)
-    
-    
-    #mapping = {"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
-    
+
     return answer
 
 def nearest_station(handle_code, location):
