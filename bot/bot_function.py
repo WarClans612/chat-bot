@@ -8,15 +8,13 @@ from pymongo import MongoClient
 import sys
 import bot_config
 import re
-#import WeatherAPI.weather as weather
-#import my_pm25 as pm25
 from sensor_fetch import get_pm25 as pm25
 from sensor_fetch import get_weather as weather
 from sensor_fetch import get_uvi as UVI
 from sensor_fetch import get_rainfall as RAINF
 from sensor_fetch import get_most
 from sensor_fetch import get_where
-from datetime import datetime #datetime.datetime
+from datetime import datetime
 import urllib.request
 import urllib.parse
 
