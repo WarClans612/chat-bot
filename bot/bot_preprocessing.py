@@ -78,8 +78,6 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
         else:
             num_of_keyword.append(len(words))
         keywords.extend(words)
-    # print(keywords)
-    # print(keyword_set)
 
     return keywords, keyword_set, num_of_keyword
     
@@ -105,8 +103,7 @@ def sensor_data_init(sensor_start_num, sensor_filename):
             data["num_of_keyword"] = len(keyword_list)
             data_list.append(data)
         question_num = question_num +1
-    #print(data_list)
-    #print(sensor_keywords)
+
     sensor_question_list = data_list
     
     ###for handle_table
@@ -120,7 +117,7 @@ def sensor_data_init(sensor_start_num, sensor_filename):
             data["A_template"] = a["answer_template"]
             data_list.append(data)
             answer_code = answer_code +1
-    #print(data_list)
+
     sensor_handle_list = data_list
     
     ###for button_table
@@ -132,7 +129,7 @@ def sensor_data_init(sensor_start_num, sensor_filename):
         data["button_list"] = item["B"]
         data_list.append(data)
         question_num = question_num +1
-    #print(data_list)
+
     sensor_button_list = data_list
     
     i_start_num = question_num
@@ -162,8 +159,7 @@ def i_data_init(i_start_num, i_filename):
             data["num_of_keyword"] = len(keyword_list)
             data_list.append(data)
         question_num = question_num +1
-    #print(data_list)
-    #print(sensor_keywords)
+
     i_question_list = data_list
     
     
@@ -176,7 +172,7 @@ def i_data_init(i_start_num, i_filename):
         data["answer"] = item["A"]
         data_list.append(data)
         question_num = question_num +1
-    #print(data_list)
+
     i_answer_list = data_list
     
     i_start_num = question_num
@@ -240,16 +236,6 @@ if __name__ == '__main__':
         collect.insert_one(data)
     for data in i_question_list:
         collect.insert_one(data)
-    # sensor_start_num = question_num_set[len(question_num_set)-1] + 1
-    # for i in range(len(sensor_question_set)):
-        # data = {"question": sensor_question_set[i],
-                # "question_num": sensor_start_num + sensor_question_num_set[i],
-                # "keyword_list": sensor_keyword_set[i],
-                # "num_of_keyword": sensor_num_of_keyword[i],
-                # "handle_code": sensor_question_num_set[i] + 1 ,
-                # "type": "sensor"
-                # }
-        # collect.insert_one(data)
     """
     data = {"question": "現在適合出門嗎?",
              "question_num": 0,
@@ -279,19 +265,7 @@ if __name__ == '__main__':
     collect = db['handle_table']
     for data in sensor_handle_list:
         collect.insert_one(data)
-    
-    # flag_handle = 0
-    # for i in range(len(sensor_answer_set)):
-        # if flag_handle != (sensor_answer_num_set[i] + 1) :
-            # flag_handle = sensor_answer_num_set[i] + 1
-            # answer_code = 1
-        # else:
-            # answer_code += 1 
-        # data = {"handle_code": sensor_answer_num_set[i] + 1,
-                # "answer_code": answer_code,
-                # "A_template": sensor_answer_set[i]
-            # }
-        # collect.insert_one(data)
+
     print("[handle_table]")
     for post in collect.find():
         print (post)
