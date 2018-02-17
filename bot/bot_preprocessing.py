@@ -22,7 +22,6 @@ def open_qa_file(filename):
     with open(filename, 'r', encoding='utf8') as fr:
         for line in fr:
             text = line.strip()
-            #"Q: question"
             if text[0] == 'Q':
                 if flag_pre == 'A':
                     i += 1
@@ -36,31 +35,6 @@ def open_qa_file(filename):
             else :
                 print("[err in general_QAset: start not with Q: or A: ]")
     return question_set, question_num_set, answer_set, answer_num_set
-
-def open_sensor_qa_file(filename):
-    question_set = []
-    question_num_set = []
-    answer_set = []
-    answer_num_set = []
-    i = 0
-    flag_pre = 'N'
-    with open(filename, 'r', encoding='utf8') as fr:
-        for line in fr:
-            text = line.strip()
-            #"Q: question"
-            if text[0] == 'Q':
-                if flag_pre == 'A':
-                    i += 1
-                question_set.append(text[3:])
-                question_num_set.append(i)
-                flag_pre = 'Q'
-            elif text[0] == 'A':
-                answer_set.append(text[3:])
-                answer_num_set.append(i)
-                flag_pre = 'A'
-            else :
-                print("[err in sensor_QAset: start not with Q: or A: ]")
-    return question_set, question_num_set, answer_set, answer_num_set   
 
 def init_jieba(stop_words_filename, idf_filename, question_set):
     jieba.analyse.set_stop_words(stop_words_filename)
@@ -187,7 +161,6 @@ if __name__ == '__main__':
     sensor_filename = bot_config.sensorQAset
     i_filename = bot_config.iQAset
     question_set, question_num_set, answer_set, answer_num_set = open_qa_file(filename)
-    #sensor_question_set, sensor_question_num_set, sensor_answer_set, sensor_answer_num_set = open_sensor_qa_file(sensor_filename)
 
     ### Initialize jieba
     stop_words_filename = 'extra_dict/stop_words.txt'
@@ -196,8 +169,6 @@ if __name__ == '__main__':
     jieba.set_dictionary('extra_dict/zh-tw_dict.txt')
     jieba.load_userdict("extra_dict/my_dict.txt")
     jieba.load_userdict("extra_dict/location_dict.txt")
-    jieba.analyse.set_stop_words(stop_words_filename)
-    jieba.analyse.set_idf_path(idf_filename)
     
     keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
     sensor_start_num = question_num_set[len(question_num_set)-1] + 1
