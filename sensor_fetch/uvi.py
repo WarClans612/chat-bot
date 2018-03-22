@@ -1,3 +1,24 @@
+# -*- coding: utf-8 -*-
+from datetime import datetime
+from sensor_fetch.util import grab_raw_data_from_url
+
+def parse_json_data(raw_data):
+    uvi_data = []
+    for item in raw_data:
+        data = {}
+        if item['UVI'] == "":
+            data['UVI'] = 0.0
+        elif float(item['UVI']) > 0:
+            data['UVI'] = float(item['UVI'])
+        else:
+            data['UVI'] = 0.0
+        data['County'] = item['County']
+        data['PublishTime'] = datetime.strptime(item['PublishTime'], "%Y-%m-%d %H:%M")
+        data['SiteName'] = item['SiteName']
+        data['WGS84Lon'] = item['WGS84Lon']
+        data['WGS84Lat'] = item['WGS84Lat']
+        uvi_data.append(data)
+    return uvi_data
 
 def fetch():
     """
@@ -18,4 +39,6 @@ def fetch():
             ...
         ]
     """
-    pass
+    raw_data = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
+    uvi_data = parse_json_data(raw_data)
+    return uvi_data
