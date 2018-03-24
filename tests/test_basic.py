@@ -63,7 +63,7 @@ class SensorFetchTest(unittest.TestCase):
         from sensor_fetch.rainfall import fetch
         rainfall_data = fetch()
         for key in rainfall_keys:
-            self.assertIn(key, rainfall_data)
+            self.assertIn(key, rainfall_data[0])
 
     def test_fetch_station_location(self):
         """
