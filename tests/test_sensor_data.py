@@ -69,3 +69,10 @@ class SensorFetchTest(unittest.TestCase):
         for sensor_type in ['uvi','pm25']:
             for key in station_keys:
                 self.assertIn(key,station_data[sensor_type][0])
+
+    def test_store_to_database(self):
+        from sensor_fetch import pm25, rainfall, station, uvi, weather
+
+        for sensor in [pm25,rainfall, station, uvi, weather]:
+            data = sensor.fetch()
+            self.assertTrue(sensor.save(data))

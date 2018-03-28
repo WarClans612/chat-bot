@@ -60,3 +60,10 @@ def fetch():
     raw_data["uvi"] = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
     station = parse_json_data(raw_data)
     return station
+
+def save(data):
+    """
+    This function should store the input data into database
+    Return true when data is stored successfully
+    """
+    pass

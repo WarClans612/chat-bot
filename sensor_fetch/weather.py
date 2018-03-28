@@ -66,3 +66,10 @@ def fetch():
     raw_data = grab_raw_data()
     weather_data = parse_json_data(raw_data)
     return weather_data
+
+def save(data):
+    """
+    This function should store the input data into database
+    Return true when data is stored successfully
+    """
+    pass
