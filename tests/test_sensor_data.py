@@ -76,3 +76,11 @@ class SensorFetchTest(unittest.TestCase):
         for sensor in [pm25,rainfall, station, uvi, weather]:
             data = sensor.fetch()
             self.assertTrue(sensor.save(data))
+
+    def test_get_pm25(self):
+        from sensor_fetch.pm25 import get
+
+        #test get from site name
+        self.assertIsNotNone(get('基隆'))
+        #test get from county name
+        self.assertIsNotNone(get('基隆市'))
