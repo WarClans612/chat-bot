@@ -2,6 +2,7 @@
 import urllib.request
 import json
 import datetime as DT
+from sensor_fetch import sensor_config
 from datetime import datetime
 
 def grab_raw_data():
