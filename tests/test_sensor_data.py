@@ -84,3 +84,11 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(get('基隆'))
         #test get from county name
         self.assertIsNotNone(get('基隆市'))
+
+    def test_get_uvi(self):
+        from sensor_fetch.uvi import get
+
+        #test get from site name
+        self.assertIsNotNone(get('彰化'))
+        #test get from county name
+        self.assertIsNotNone(get('彰化縣'))

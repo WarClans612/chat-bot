@@ -49,3 +49,17 @@ def save(data):
     Return true when data is stored successfully
     """
     pass
+
+def get(name):
+    """
+    This function will return the UVI value in this hour by querying the database
+
+    If the data is outdated, call the fetch() and save(), then do the query again
+
+    Args:
+        name: The name can be the Site name or County
+
+    Return:
+        UVI value in this hour, ``None`` when the name can't be recongnized.`
+    """
+    pass
