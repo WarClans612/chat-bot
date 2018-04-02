@@ -92,3 +92,18 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(get('彰化'))
         #test get from county name
         self.assertIsNotNone(get('彰化縣'))
+
+    def test_get_rainfall(self):
+        from sensor_fetch.rainfall import get
+
+        #test get from site name
+        self.assertIsNotNone(get("臺灣大學"))
+        #test get from County
+        self.assertIsNotNone(get("臺北市"))
+        #test get past 1 hours
+        self.assertIsNotNone(get("臺北市", hours=1))
+        #test get past 24 hours
+        self.assertIsNotNone(get("臺北市", hours=24))
+
+        #test result data type
+        self.assertNotIsInstance(get("臺北市"), list)

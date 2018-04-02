@@ -40,3 +40,22 @@ def save(data):
     Return true when data is stored successfully
     """
     pass
+
+def get(name, hours=1):
+    """
+    This function will return the rainfall data in past ``hours`` hour(s), 
+    the rainfall data is the result of querying the database.
+
+    If the results of rainfall in ``name`` location are more than one, pick the first 
+    one as the result.
+
+    If the data is outdated, call the fetch() and save(), then do the query again.
+
+    Args:
+        name: The name can be the Site name or County
+
+    Return:
+        rainfall in past ``hours`` hour(s), ``None`` when the name can't be recongnized 
+        or the ``hours`` is not supported.`
+    """
+    pass
