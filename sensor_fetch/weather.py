@@ -73,3 +73,18 @@ def save(data):
     Return true when data is stored successfully
     """
     pass
+
+def get(name, time='now'):
+    """
+    This function will return the weather data according to the ``time``,
+    the weather data is the result of querying the database.
+
+    If the data is outdated, call the fetch() and save(), then do the query again.
+
+    Args:
+        name: location name of the weather
+
+    Return:
+        weather data now or in future ``time`` hours
+    """
+    pass

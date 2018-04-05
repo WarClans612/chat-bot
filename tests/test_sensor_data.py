@@ -107,3 +107,16 @@ class SensorFetchTest(unittest.TestCase):
 
         #test result data type
         self.assertNotIsInstance(get("臺北市"), list)
+
+    def test_get_weather(self):
+        from sensor_fetch.weather import get
+
+        self.assertIsNotNone(get("臺東縣"))
+
+        self.assertIsNotNone(get("臺東縣", time=6))
+
+        self.assertIsNotNone(get("臺東縣", time=12))
+
+        self.assertIsNotNone(get("臺東縣", time=24))
+
+        self.assertIsNotNone(get("臺東縣", time=36))
