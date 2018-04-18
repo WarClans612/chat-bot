@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from sensor_fetch.util import grab_raw_data_from_url
+from sensor_fetch.util import save_data_into_db
 
 def parse_json_data(raw_data):
     rainfall_data = []
@@ -8,7 +9,11 @@ def parse_json_data(raw_data):
         data = dict()
         data['County'] = item['County']
         data['rainfall1hr'] = float(item['Rainfall1hr'])
+        data['rainfall3hr'] = float(item['Rainfall3hr'])
+        data['rainfall6hr'] = float(item['Rainfall6hr'])
+        data['rainfall12hr'] = float(item['Rainfall12hr'])
         data['rainfall24hr'] = float(item['Rainfall24hr'])
+        data['SiteName'] = item['SiteName']
         data['PublishTime'] = datetime.strptime(item['PublishTime'], "%Y-%m-%d %H:%M:%S")
         rainfall_data.append(data)
     return rainfall_data
@@ -24,7 +29,11 @@ def fetch():
             {
                 'County': ,
                 'rainfall1hr': ,
+                'rainfall3hr': ,
+                'rainfall6hr': ,
+                'rainfall12hr': ,
                 'rainfall24hr': ,
+                'SiteName: '
                 'PublishTime':
             },
             ...
@@ -39,7 +48,7 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    pass
+    return save_data_into_db(data, 'rainfall_data')
 
 def get(name, hours=1):
     """

@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
 from sensor_fetch.util import grab_raw_data_from_url
+from sensor_fetch.util import save_data_into_db
 
 def parse_json_data(raw_data):
     pm25_data = []
@@ -42,7 +43,7 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    pass
+    return save_data_into_db(data, "pm25_data")
 
 def get(name):
     """
