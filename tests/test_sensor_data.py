@@ -120,3 +120,6 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(get("臺東縣", time=24))
 
         self.assertIsNotNone(get("臺東縣", time=36))
+
+if __name__ == "__main__":
+    unittest.main()

@@ -4,6 +4,7 @@ import json
 import datetime as DT
 from sensor_fetch import sensor_config
 from datetime import datetime
+from sensor_fetch.util import save_weather_to_db
 
 def grab_raw_data():
     Data_set = "F-C0032-001"
@@ -72,7 +73,7 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    pass
+    return save_weather_to_db(data)
 
 def get(name, time='now'):
     """
