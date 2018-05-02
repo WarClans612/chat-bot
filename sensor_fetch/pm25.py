@@ -2,6 +2,8 @@
 from datetime import datetime
 from sensor_fetch.util import grab_raw_data_from_url
 from sensor_fetch.util import save_data_into_db
+from sensor_fetch.util import SensorParam
+from sensor_fetch.util import get_data
 
 def parse_json_data(raw_data):
     pm25_data = []
@@ -55,4 +57,5 @@ def get(name):
         name: The name can be the Site name or County
 
     """
-    pass
+    sensor_param = SensorParam(name, 'pm25_data', 'PM25', fetch, save)
+    return get_data(sensor_param)

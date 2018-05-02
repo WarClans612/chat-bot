@@ -2,6 +2,8 @@
 from datetime import datetime
 from sensor_fetch.util import grab_raw_data_from_url
 from sensor_fetch.util import save_data_into_db
+from sensor_fetch.util import SensorParam
+from sensor_fetch.util import get_data
 
 def parse_json_data(raw_data):
     uvi_data = []
@@ -63,4 +65,5 @@ def get(name):
     Return:
         UVI value in this hour, ``None`` when the name can't be recongnized.`
     """
-    pass
+    sensor_param = SensorParam(name, 'uvi_data', 'UVI', fetch, save)
+    return get_data(sensor_param)

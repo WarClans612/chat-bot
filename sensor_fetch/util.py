@@ -2,7 +2,27 @@
 import urllib.request
 import json
 from pymongo import MongoClient
+import datetime as DT
+from datetime import datetime
 from sensor_fetch import sensor_config
+
+
+class SensorParam:
+
+    def __init__(self, location_name, name, item_name, fetch_func, save_func, time='now'):
+        self.location_name = location_name
+        self.collection_name = name
+        self.item_name = item_name
+        self.fetch_func = fetch_func
+        self.save_func = save_func
+        self.time = time
+    
+    def fetch(self):
+        return self.fetch_func()
+    
+    def save(self, data):
+        return self.save_func(data)
+
 
 def grab_raw_data_from_url(url):
     with urllib.request.urlopen(url) as response:
@@ -47,3 +67,58 @@ def save_weather_to_db(weather_data):
             if insert_status == None:
                 save_status = False
     return save_status
+
+def get_data(sensor_param):
+    '''
+        collection_name -> item_name:
+            pm25_data -> PM25
+            uvi_data -> UVI
+            rainfall_data -> rainfall1hr, rainfall3hr, rainfall6hr, rainfall12hr, rainfall24hr
+            weather_data -> temperature, rainfull_prob
+    '''
+    collection_name = sensor_param.collection_name
+    location_name = sensor_param.location_name
+    item_name = sensor_param.item_name
+    db = connect_to_database()
+    collect = db[collection_name]
+    
+    now_time = datetime.now()
+    now_hour = datetime(now_time.year, now_time.month, now_time.day, now_time.hour, 0, 0, 0)
+    
+    #Special parts for weather
+    if collection_name == 'weather_data':
+        #Fetch the data for now
+        if sensor_param.time == 'now':
+            time_wanted = now_time
+        #Fetch the data for the 'time' in 'hours' in the future
+        else:
+            time_wanted = now_time + DT.timedelta(hours=sensor_param.time)    
+        item = collect.find_one({'endTime': {'$gt': time_wanted},'startTime': {'$lt': time_wanted},'locationName':location_name})
+        #If required data not found in the DB, re fetch the data from source
+        if item is None:
+            sensor_param.save(sensor_param.fetch())
+            item = collect.find_one({'endTime': {'$gt': time_wanted},'startTime': {'$lt': time_wanted},'locationName':location_name})
+        return item
+    
+    #Initial data get from DB
+    item = collect.find_one({'$and': [{'PublishTime': {'$eq': now_hour}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
+
+    #If required data not found in DB, re fetch the data from source
+    if item is None or item[item_name] == 'ND':
+        fetch_data = sensor_param.fetch()
+        sensor_param.save(fetch_data)
+        time = fetch_data[0]['PublishTime']
+        item = collect.find_one({'$and': [{'PublishTime': {'$eq': time}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
+    #Change the time to the last hour and re search DB
+    if item is None or item[item_name] == 'ND':
+        before_hour = now_hour - DT.timedelta(hours=1)
+        item = collect.find_one({'$and': [{'PublishTime': {'$gt': before_hour}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
+    #Change the time to the last day and re search DB
+    if item is None or item[item_name] == 'ND':
+        now_day = datetime(now_time.year, now_time.month, now_time.day, 0, 0, 0, 0)
+        item = collect.find_one({'$and': [{'PublishTime': {'$gt': now_day}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
+    
+    if item is None or item[item_name] == 'ND':
+        return None
+    else:
+        return item[item_name]

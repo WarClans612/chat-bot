@@ -2,6 +2,8 @@
 from datetime import datetime
 from sensor_fetch.util import grab_raw_data_from_url
 from sensor_fetch.util import save_data_into_db
+from sensor_fetch.util import SensorParam
+from sensor_fetch.util import get_data
 
 def parse_json_data(raw_data):
     rainfall_data = []
@@ -67,4 +69,10 @@ def get(name, hours=1):
         rainfall in past ``hours`` hour(s), ``None`` when the name can't be recongnized 
         or the ``hours`` is not supported.`
     """
-    pass
+    supported_hour = [1, 3, 6, 12, 24]
+    if hours not in supported_hour:
+        return None
+    else:
+        item_name = 'rainfall' + str(hours) + 'hr'
+        sensor_param = SensorParam(name, 'rainfall_data', item_name, fetch, save)
+        return get_data(sensor_param)

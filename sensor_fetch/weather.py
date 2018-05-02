@@ -5,6 +5,8 @@ import datetime as DT
 from sensor_fetch import sensor_config
 from datetime import datetime
 from sensor_fetch.util import save_weather_to_db
+from sensor_fetch.util import SensorParam
+from sensor_fetch.util import get_data
 
 def grab_raw_data():
     Data_set = "F-C0032-001"
@@ -88,4 +90,5 @@ def get(name, time='now'):
     Return:
         weather data now or in future ``time`` hours
     """
-    pass
+    sensor_param = SensorParam(name, 'weather_data', ['temperature', 'rainfull_prob'], fetch, save, time)
+    return get_data(sensor_param)
