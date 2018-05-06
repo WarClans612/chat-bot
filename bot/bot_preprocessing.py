@@ -4,8 +4,9 @@ import jieba
 import jieba.analyse
 from pymongo import MongoClient
 import math
-import bot_config
 import json
+from bot import bot_config
+from bot import util
 
 topK = 20
 withWeight = False
@@ -17,20 +18,20 @@ def open_qa_file(filename):
     question_num_set = []
     answer_set = []
     answer_num_set = []
-    i = 1
+    counter = 1
     flag_pre = 'N'
     with open(filename, 'r', encoding='utf8') as fr:
         for line in fr:
             text = line.strip()
             if text[0] == 'Q':
                 if flag_pre == 'A':
-                    i += 1
+                    counter += 1
                 question_set.append(text[3:])
-                question_num_set.append(i)
+                question_num_set.append(counter)
                 flag_pre = 'Q'
             elif text[0] == 'A':
                 answer_set.append(text[3:])
-                answer_num_set.append(i)
+                answer_num_set.append(counter)
                 flag_pre = 'A'
             else :
                 print("[err in general_QAset: start not with Q: or A: ]")
@@ -55,9 +56,9 @@ def init_jieba(stop_words_filename, idf_filename, question_set):
 
     return keywords, keyword_set, num_of_keyword
     
-def sensor_data_init(sensor_start_num, sensor_filename):
-    fr = open(sensor_filename,"r",encoding = "utf8")
-    text = fr.read()
+def sensor_data_init(sensor_start_num, sensor_QA_filename):
+    with open(sensor_QA_filename,"r",encoding = "utf8") as fr:
+        text = fr.read()
     j_data = json.loads(text)
     
     ###for question_table
@@ -77,7 +78,6 @@ def sensor_data_init(sensor_start_num, sensor_filename):
             data["num_of_keyword"] = len(keyword_list)
             data_list.append(data)
         question_num = question_num +1
-
     sensor_question_list = data_list
     
     ###for handle_table
@@ -91,7 +91,6 @@ def sensor_data_init(sensor_start_num, sensor_filename):
             data["A_template"] = a["answer_template"]
             data_list.append(data)
             answer_code = answer_code +1
-
     sensor_handle_list = data_list
     
     ###for button_table
@@ -103,16 +102,14 @@ def sensor_data_init(sensor_start_num, sensor_filename):
         data["button_list"] = item["B"]
         data_list.append(data)
         question_num = question_num +1
-
     sensor_button_list = data_list
-    
     i_start_num = question_num
     
-    return sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list, i_start_num
+    return sensor_keywords, sensor_question_list, sensor_handle_list, sensor_button_list, i_start_num
         
 def i_data_init(i_start_num, i_filename):
-    fr = open(i_filename,"r",encoding = "utf8")
-    text = fr.read()
+    with open(i_filename,"r",encoding = "utf8") as fr:
+        text = fr.read()
     j_data = json.loads(text)
     
     ###for question_table
@@ -148,40 +145,40 @@ def i_data_init(i_start_num, i_filename):
         question_num = question_num +1
 
     i_answer_list = data_list
-    
-    i_start_num = question_num
-    
-    return i_keywords,i_question_list,i_answer_list
-        
 
-    
-if __name__ == '__main__':
+    i_start_num = question_num
+
+    return i_keywords,i_question_list,i_answer_list
+
+def init_bot_QAset():
     ### Init QA from file
-    filename = bot_config.QAset
-    sensor_filename = bot_config.sensorQAset
+    QA_filename = bot_config.QAset
+    sensor_QA_filename = bot_config.sensorQAset
     i_filename = bot_config.iQAset
-    question_set, question_num_set, answer_set, answer_num_set = open_qa_file(filename)
+    question_set, question_num_set, answer_set, answer_num_set = open_qa_file(QA_filename)
 
     ### Initialize jieba
-    stop_words_filename = 'extra_dict/stop_words.txt'
-    idf_filename = 'extra_dict/idf.txt.big'
+    stop_words_filename = bot_config.stopWordsDict
+    idf_filename = bot_config.idfFile
 
-    jieba.set_dictionary('extra_dict/zh-tw_dict.txt')
-    jieba.load_userdict("extra_dict/my_dict.txt")
-    jieba.load_userdict("extra_dict/location_dict.txt")
+    jieba.set_dictionary(bot_config.twDict)
+    jieba.load_userdict(bot_config.userDict)
+    jieba.load_userdict(bot_config.locationDict)
     
     keywords, keyword_set, num_of_keyword = init_jieba(stop_words_filename, idf_filename, question_set)
     sensor_start_num = question_num_set[len(question_num_set)-1] + 1
-    sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list, i_start_num = sensor_data_init(sensor_start_num,sensor_filename)
+    sensor_keywords,sensor_question_list,sensor_handle_list,sensor_button_list, i_start_num = sensor_data_init(sensor_start_num,sensor_QA_filename)
     i_keywords,i_question_list,i_answer_list = i_data_init(i_start_num,i_filename)
     #sensor_keywords, sensor_keyword_set, sensor_num_of_keyword = init_jieba(stop_words_filename, idf_filename, sensor_question_set)
     keywords.extend(sensor_keywords)
     
+    ##Check if any error occured
+    for var in [question_set, sensor_question_list, i_question_list, answer_set, sensor_handle_list, keywords, sensor_button_list]:
+        if var is None:
+            return False
+    
     ###connect to DB:"bot"
-    db_url = bot_config.db_url 
-    db_name = bot_config.db_name
-    client = MongoClient(db_url)
-    db = client[db_name]
+    db = util.connect_to_database()
     
     ### drop all tables to reset
     db.drop_collection('question_table')
@@ -216,9 +213,6 @@ if __name__ == '__main__':
              "handle_code": 0 
             }
     """
-    print("[question_table]")   
-    for post in collect.find():
-        print (post)
     
     ### Save into DB table:"answer_table"
     collect = db['answer_table']
@@ -227,19 +221,12 @@ if __name__ == '__main__':
                 "answer": answer_set[i]
             }
         collect.insert_one(data)
-    collect.insert(i_answer_list)
-    print("[answer_table]")
-    for post in collect.find():
-        print (post)
+    collect.insert_many(i_answer_list)
     
     ### Save into DB table:"handle_table"
     collect = db['handle_table']
     for data in sensor_handle_list:
         collect.insert_one(data)
-
-    print("[handle_table]")
-    for post in collect.find():
-        print (post)
         
     ### Save into DB table:"keyword_data"
     collect = db['keyword_data']
@@ -257,10 +244,6 @@ if __name__ == '__main__':
         data_new = { "$set" : { "prob": prob , "weight_prob": weight_prob , "weight_e": weight_e} }
         collect.update_one(data_k,data_new,upsert=True)
         
-    print("[keyword_data]")
-    for post in collect.find():
-        print (post)
-        
     ### Save into DB table:"statistic_data"
     collect = db['statistic_data']
     data = {"name": "num_of_frequency",
@@ -272,23 +255,17 @@ if __name__ == '__main__':
     data = {"name": "num_of_questions",
             "value": len(question_set)}
     collect.insert_one(data)
-
-    print("[statistic_data]")
-    for post in collect.find():
-        print (post)
         
     ### Save into DB table:"button_table"
     collect = db['button_table']
     for data in sensor_button_list:
         collect.insert_one(data)
-
-    print("[button_table]")
-    for post in collect.find():
-        print (post)
-        
         
     ###save init_num
     collect = db["question_table"]
     init_question = collect.find_one({"handle_code":"WEATHER"})["question_num"]
     collect = db["user_information"]
     result = collect.update_many({}, { "$set": { "question_num": init_question } })
+    
+    #Return true if all succeed
+    return True

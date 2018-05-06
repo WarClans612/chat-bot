@@ -1,0 +1,170 @@
+[
+{ 
+	"Q":
+		[
+			"天氣",
+			"天氣 下雨",
+			"冷熱",
+			"氣溫",
+			"溫度",
+			"溫度如何",
+			"溫度怎麼樣",
+			"天氣如何",
+			"天氣怎麼樣",
+			"天氣好不好"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，外出記得多穿幾件衣服!" },
+			{ "answer_code": 2, "answer_template" : "#space##time#氣溫#temperature#度，溫度舒適。" },
+			{ "answer_code": 3, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，請多多補充水分!" },
+			{ "answer_code": 4, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，而且有#rainfull_prob#%機率下雨，外出記得多穿幾件衣服還有攜帶雨具喔!" },
+			{ "answer_code": 5, "answer_template" : "#space##time#氣溫#temperature#度，溫度適中，但有#rainfull_prob#%機率下雨，外出記得攜帶雨具喔!" },
+			{ "answer_code": 6, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，而且有#rainfull_prob#%機率下雨，請多多補充水份，外出記得攜帶雨具!" }
+		],
+	"B":[
+			{ "title" : "訂閱天氣", "payload" : "_FUN=SUB_TAG=WEATHER_" },
+			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=WEATHER_" }
+		],
+	"H": "WEATHER"
+},
+{ 
+	"Q":
+		[
+			"會下雨嗎?",
+			"下雨機率?",
+			"降雨機率",
+			"下雨",
+			"降雨"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "#space##time#降雨機率#rainfull_prob#%。" },
+			{ "answer_code": 2, "answer_template" : "#space##time#降雨機率#rainfull_prob#%，有很大機率降雨，外出請記得攜帶雨具喔!" }
+		],
+	"B":[
+			{ "title" : "訂閱降雨", "payload" : "_FUN=SUB_TAG=RAIN_" },
+			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=RAIN_" }
+		],
+	"H": "RAIN"
+},
+{ 
+	"Q":
+		[
+			"空氣品質?",
+			"PM2.5",
+			"PM 2.5",
+			"Pm2.5",
+			"Pm 2.5",
+			"pm2.5",
+			"pm 2.5",
+			"PM25",
+			"PM 25",
+			"Pm 25",
+			"pm 25",
+			"pm25",
+			"PM2.5濃度高嗎?",
+			"pm2.5濃度高嗎?",
+			"PM2.5濃度多少?",
+			"pm2.5濃度多少?",
+			"空氣好嗎?",
+			"空氣乾淨嗎?",
+			"空氣髒嗎?",
+			"空氣怎麼樣?",
+			"懸浮微粒",
+			"懸浮粒子"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "目前#space#PM2.5濃度#pm25#,空氣品質良好，可盡情呼吸新鮮空氣。" },
+			{ "answer_code": 2, "answer_template" : "目前#space#PM2.5濃度#pm25#,空氣品質中等，敏感性族群可能有些不適，請盡量避免外出。" },
+			{ "answer_code": 3, "answer_template" : "目前#space#PM2.5濃度#pm25#,空氣品質很差，請盡量避免外出以免產生不適症狀。" },
+			{ "answer_code": 4, "answer_template" : "目前#space#PM2.5濃度#pm25#,空氣品質非常糟糕，強烈建議您避免外出，尤其是心血管、呼吸道疾病之患者或老年人。" }
+		],
+	"B":[
+			{ "title" : "訂閱PM2.5", "payload" : "_FUN=SUB_TAG=PM25_" },
+			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=PM25_" }
+		],
+	"H": "PM25"
+},
+{ 
+	"Q":
+		[
+			"適合出門嗎?",
+			"可以出門嗎?",
+			"適合外出嗎?",
+			"可以外出嗎?",
+			"適合出去嗎?",
+			"可以出去嗎?"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，外出記得多穿幾件衣服!" },
+			{ "answer_code": 2, "answer_template" : "#space##time#溫度適中，天氣良好，空氣品質也不錯，非常適合出門活動喔!" },
+			{ "answer_code": 3, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，外出活動請多多補充水分!" },
+			{ "answer_code": 4, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，而且有#rainfull_prob#%機率下雨，比較不建議外出活動。" },
+			{ "answer_code": 5, "answer_template" : "#space##time#降雨機率#rainfull_prob#%，有很大機率降雨，若要外出請記得攜帶雨具喔!" },
+			{ "answer_code": 6, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，而且有#rainfull_prob#%機率下雨，若要外出記得攜帶雨具並多多補充水份!" },
+			{ "answer_code": 7, "answer_template" : "#space##time#空氣品質不太好，氣溫#temperature#度，有點冷喔，請盡量避免外出以免不適，若要外出記得多穿幾件衣服!" },
+			{ "answer_code": 8, "answer_template" : "#space##time#空氣品質很差，請盡量避免外出以免產生不適症狀。" },
+			{ "answer_code": 9, "answer_template" : "#space##time#空氣品質不太好，氣溫#temperature#度，比較炎熱，請盡量避免外出以免不適，外出活動請多多補充水分!" },
+			{ "answer_code": 10, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，而且有#rainfull_prob#%機率下雨、空氣品質也不太好，比較不建議外出活動。" },
+			{ "answer_code": 11, "answer_template" : "#space##time#降雨機率#rainfull_prob#%，有很大機率降雨，而且空氣品質也不太好，比較不建議外出活動，若要外出請記得攜帶雨具喔!" },
+			{ "answer_code": 12, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，而且有#rainfull_prob#%機率下雨、空氣品質也不太好，比較不建議外出活動。" },
+			
+			{ "answer_code": 13, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，紫外線指數UVI#uvi#也已達過量級,外出記得多穿幾件衣服並注意防曬!" },
+			{ "answer_code": 14, "answer_template" : "#space##time#溫度適中，天氣良好，空氣品質也不錯，但紫外線指數UVI#uvi#已達過量級,出門活動記得防曬喔!" },
+			{ "answer_code": 15, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，且紫外線指數UVI#uvi#已達過量級,外出活動請多多補充水分注意防曬!" },
+			{ "answer_code": 16, "answer_template" : "#space##time#氣溫#temperature#度，而且有#rainfull_prob#%機率下雨，較為濕冷,而且且紫外線指數UVI#uvi#已達過量級,比較不建議外出活動。" },
+			{ "answer_code": 17, "answer_template" : "#space##time#降雨機率#rainfull_prob#%，有很大機率降雨，且紫外線指數UVI#uvi#已達過量級,若要外出請記得攜帶雨具做好防曬喔!" },
+			{ "answer_code": 18, "answer_template" : "#space##time#氣溫#temperature#度，紫外線指數UVI#uvi#已達過量級,比較炎熱，而且有#rainfull_prob#%機率下雨，若要外出記得攜帶雨具並多多補充水份注意防曬!" },
+			{ "answer_code": 19, "answer_template" : "#space##time#空氣品質不太好，紫外線指數UVI#uvi#已達過量級,氣溫#temperature#度，有點冷喔，請盡量避免外出以免不適，若要外出記得多穿幾件衣服注意防曬!" },
+			{ "answer_code": 20, "answer_template" : "#space##time#空氣品質很差，且紫外線指數UVI#uvi#已達過量級,請盡量避免外出以免產生不適症狀。" },
+			{ "answer_code": 21, "answer_template" : "#space##time#空氣品質不太好，氣溫#temperature#度，且紫外線指數UVI#uvi#已達過量級,比較炎熱，請盡量避免外出以免不適，外出活動請多多補充水分注意防曬!" },
+			{ "answer_code": 22, "answer_template" : "#space##time#氣溫#temperature#度，有點冷喔，而且有#rainfull_prob#%機率下雨、空氣品質也不太好，且紫外線指數UVI#uvi#已達過量級,比較不建議外出活動。" },
+			{ "answer_code": 23, "answer_template" : "#space##time#降雨機率#rainfull_prob#%，有很大機率降雨，而且空氣品質也不太好、紫外線指數UVI#uvi#已達過量級,比較不建議外出活動，若要外出請記得攜帶雨具喔!" },
+			{ "answer_code": 24, "answer_template" : "#space##time#氣溫#temperature#度，比較炎熱，而且有#rainfull_prob#%機率下雨、空氣品質也不太好、且紫外線指數UVI#uvi#已達過量級，比較不建議外出活動。" }
+		],
+	"B":[
+			{ "title" : "訂閱外出資訊", "payload" : "_FUN=SUB_TAG=GOOUT_" },
+			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=GOOUT_" }
+		],
+	"H": "GOOUT"
+},
+{ 
+	"Q":
+		[
+			"紫外線",
+			"UV",
+			"uv"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "目前#space#紫外線指數UVI #uvi#,在輕量級至中量級之間,較不會曬傷" },
+			{ "answer_code": 2, "answer_template" : "目前#space#紫外線指數UVI #uvi#,屬於高量級,請做好防曬並盡量待在陰涼處" },
+			{ "answer_code": 3, "answer_template" : "目前#space#紫外線指數UVI #uvi#,已達過量級,請做好防曬並避免中午時段外出" },
+			{ "answer_code": 4, "answer_template" : "目前#space#紫外線指數UVI #uvi#,已達危險級,請做好防曬並避免中午時段外出,勿在太陽曝曬下超過15分鐘" }
+		],
+	"B":[
+			{ "title" : "訂閱紫外線指數", "payload" : "_FUN=SUB_TAG=UVI_" },
+			{ "title" : "不要再提醒我", "payload" : "_FUN=NEVERSUB_TAG=UVI_" }
+		],
+	"H": "UVI"
+},
+{ 
+	"Q":
+		[
+			"雨量",
+			"降雨量",
+			"雨量多少",
+			"累積雨量多少",
+			"降雨量多少",
+			"累積雨量"
+		],
+	"A":[
+			{ "answer_code": 1, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm" },
+			{ "answer_code": 2, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達大雨標準" },
+			{ "answer_code": 3, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達豪雨標準，若出門請小心安全" },
+			{ "answer_code": 4, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達大豪雨標準，請盡量不要出門" },
+			{ "answer_code": 5, "answer_template" : "目前#space#時雨量#rainfall1hr#mm,24小時累積雨量#rainfall24hr#mm，已達超大豪雨標準，外出很危險!" }
+		],
+	"B":[
+		],
+	"H": "RAINFALL"
+}
+]
