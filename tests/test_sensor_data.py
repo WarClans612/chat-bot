@@ -120,6 +120,21 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(get("臺東縣", time=24))
 
         self.assertIsNotNone(get("臺東縣", time=36))
+        
+    def test_sensor_highest_value(self):
+        from sensor_fetch.sensor_highest_value import sensor_highest_value
+        
+        #test for highest
+        self.assertIsNotNone(sensor_highest_value("PM25", "H"))
+        self.assertIsNotNone(sensor_highest_value("temperature", "H"))
+        self.assertIsNotNone(sensor_highest_value("UVI", "H"))
+        self.assertIsNotNone(sensor_highest_value("RAINFALL", "H"))
+        
+        #test for lowest
+        self.assertIsNotNone(sensor_highest_value("PM25", "L"))
+        self.assertIsNotNone(sensor_highest_value("temperature", "L"))
+        self.assertIsNotNone(sensor_highest_value("UVI", "L"))
+        self.assertIsNotNone(sensor_highest_value("RAINFALL", "L"))
 
 if __name__ == "__main__":
     unittest.main()
