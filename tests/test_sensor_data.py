@@ -120,7 +120,7 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(get("臺東縣", time=24))
 
         self.assertIsNotNone(get("臺東縣", time=36))
-        
+
     def test_sensor_highest_value(self):
         from sensor_fetch.sensor_highest_value import sensor_highest_value
         
@@ -135,6 +135,28 @@ class SensorFetchTest(unittest.TestCase):
         self.assertIsNotNone(sensor_highest_value("temperature", "L"))
         self.assertIsNotNone(sensor_highest_value("UVI", "L"))
         self.assertIsNotNone(sensor_highest_value("RAINFALL", "L"))
+
+    def test_location_of_sky_condition(self):
+        from sensor_fetch.sky import location_of_sky_condition
+        
+        #Initializing test argument
+        slots = {}
+        slots["time"] = "now"
+        
+        self.assertIsNotNone(location_of_sky_condition("rainbow", slots))
+        self.assertIsNotNone(location_of_sky_condition("sunrise", slots))
+        self.assertIsNotNone(location_of_sky_condition("sunrise"))
+        
+    def test_on_sky(self):
+        from sensor_fetch.sky import on_sky
+        
+        #Initializing test argument
+        slots = {}
+        slots["space"] = "臺東縣"
+        slots["time"] = "now"
+        
+        self.assertIsNotNone(on_sky("rainbow", slots))
+        self.assertIsNotNone(on_sky("sunrise", slots))
 
 if __name__ == "__main__":
     unittest.main()
