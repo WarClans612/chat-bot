@@ -86,6 +86,8 @@ def on_sky(types, slots):
         return False, None
         
     item = collect.find_one({'endTime': {'$gt': time_we_want},'startTime': {'$lt': time_we_want},'locationName':Location_name})
+    if item is None:
+        return None
     wx = item["Wx"]
     
     if wx in wanted_list:
