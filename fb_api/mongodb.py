@@ -1,6 +1,6 @@
 import pymongo
 from pymongo import MongoClient
-from settings import *
+from fb_config import *
 from pymessager.message import QuickReply
 import datetime as DT
 from datetime import datetime

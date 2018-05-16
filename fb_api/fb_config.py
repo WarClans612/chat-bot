@@ -1,5 +1,3 @@
-import sys
-sys.path.append("C:/Users/plum/Documents/Python Scripts/chat-bot")
 from bot import bot_config
 
 MONGO_HOST = bot_config.db_url
