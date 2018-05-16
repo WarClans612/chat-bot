@@ -17,6 +17,26 @@ class BotTest(unittest.TestCase):
         self.assertTrue(init_bot_QAset())
         
     ###############################################################
+    #Test for bot/method.py
+    def test_get_score(self):
+        from bot.method import get_score
+        
+        question = ["今天","天氣", "老人家"]
+        self.assertIsNotNone(get_score(question, 'frequency'))
+        self.assertIsNotNone(get_score(question, 'ratio'))
+        self.assertIsNotNone(get_score(question, 'probability'))
+        self.assertIsNotNone(get_score(question, 'weight_e'))
+        self.assertIsNotNone(get_score(question, 'fre_prob'))
+        self.assertIsNotNone(get_score(question, 'combination'))
+        
+    #Test for bot/method.py
+    def test_integrateQA(self):
+        from bot.method import integrateQA
+        
+        question = ["今天","天氣"]
+        self.assertIsNotNone(integrateQA(question))
+        
+    ###############################################################
     #Test for bot/bot_function.py
     def test_segment(self):
         from bot.bot_function import segment
