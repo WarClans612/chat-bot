@@ -2,12 +2,15 @@
 # -*- coding: utf8 -*-
 import json
 from enum import Enum
+import logging
 
 import requests
 
 __author__ = "enginebai"
 
-URL_BASE = "https://graph.facebook.com/v2.6/me/"  # v2.9?!?
+URL_BASE = "https://graph.facebook.com/v2.9/"
+logger = logging.getLogger(__name__)
+logger.addHandler(logging.NullHandler())
 
 # send message fields
 RECIPIENT_FIELD = "recipient"
@@ -87,7 +90,8 @@ class GenericElement:
         self.buttons = buttons
 
     def to_dict(self):
-        element_dict = {BUTTONS_FIELD: [button.to_dict() for button in self.buttons]}
+        element_dict = {BUTTONS_FIELD: [
+            button.to_dict() for button in self.buttons]}
         if self.title:
             element_dict[TITLE_FIELD] = self.title
         if self.subtitle:
@@ -98,7 +102,9 @@ class GenericElement:
 
 
 class QuickReply:
-    def __init__(self, title=None, payload=None, image_url=None, content_type=ContentType.TEXT):
+    def __init__(self, title, payload,
+                 image_url=None,
+                 content_type=ContentType.TEXT):
         self.title = title
         self.payload = payload
         self.image_url = image_url
@@ -111,7 +117,7 @@ class QuickReply:
             reply_dict[TITLE_FIELD] = self.title
         if self.image_url:
             reply_dict[IMAGE_FIELD] = self.image_url
-        print(reply_dict)
+        logger.debug(reply_dict)
         return reply_dict
 
 
@@ -119,18 +125,18 @@ class Messager(object):
     def __init__(self, access_token):
         self.access_token = access_token
 
-    def subscribe_to_page(self):  # Why v2.9 here
-        fmt = "https://graph.facebook.com/v2.9/me/subscribed_apps?access_token={token}"
+    def subscribe_to_page(self):
+        fmt = URL_BASE + "me/subscribed_apps?access_token={token}"
         return requests.post(fmt.format(token=self.access_token))
 
-    def set_greeting_text(self, text):  # And v2.6 here
+    def set_greeting_text(self, text):
         data = {"setting_type": "greeting", "greeting": {"text": text}}
-        fmt = "https://graph.facebook.com/v2.6/me/thread_settings?access_token={token}"
+        fmt = URL_BASE + "me/thread_settings?access_token={token}"
         return requests.post(fmt.format(token=self.access_token),
                              headers={"Content-Type": "application/json"},
                              data=json.dumps(data))
 
-    def set_get_started_button_payload(self, payload):  # And v2.6 here
+    def set_get_started_button_payload(self, payload):
         data = {"setting_type": "call_to_actions",
                 "thread_state": "new_thread",
                 "call_to_actions": [{"payload": payload}]}
@@ -175,7 +181,8 @@ class Messager(object):
                         ATTACHMENT_FIELD: {
                             TYPE_FIELD: AttachmentType.TEMPLATE.value,
                             PAYLOAD_FIELD: {
-                                TEMPLATE_TYPE_FIELD: TemplateType.GENERIC.value,
+                                TEMPLATE_TYPE_FIELD:
+                                    TemplateType.GENERIC.value,
                                 ELEMENTS_FIELD: elements
                             }
                         }
@@ -193,7 +200,8 @@ class Messager(object):
 
     def typing(self, user_id, on=True):
         sender_action = "typing_on" if on else "typing_off"
-        data = {RECIPIENT_FIELD: {"id": user_id}, "sender_action": sender_action}
+        data = {RECIPIENT_FIELD: {"id": user_id},
+                "sender_action": sender_action}
         fmt = URL_BASE + "messages?access_token={token}"
         return requests.post(fmt.format(token=self.access_token),
                              headers={"Content-Type": "application/json"},
@@ -207,13 +215,13 @@ class Messager(object):
         post_message_url = URL_BASE + "messages?access_token={token}".format(
             token=self.access_token)
         response_message = json.dumps(message_data)
-        print(response_message)
+        logger.debug(response_message)
         req = requests.post(post_message_url,
                             headers={"Content-Type": "application/json"},
                             data=response_message)
         fmt = "[{status}/{reason}/{text}] Reply to {recipient}: {content}"
-        print(fmt.format(status=req.status_code,
-                         reason=req.reason,
-                         text=req.text,
-                         recipient=message_data[RECIPIENT_FIELD],
-                         content=message_data[MESSAGE_FIELD]))
+        logger.debug(fmt.format(status=req.status_code,
+                                reason=req.reason,
+                                text=req.text,
+                                recipient=message_data[RECIPIENT_FIELD],
+                                content=message_data[MESSAGE_FIELD]))
