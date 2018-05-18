@@ -3,8 +3,8 @@ import ssl
 import json
 app = Flask(__name__)
 
-from fb_api_config import verification_code
-import get_callback as GET
+from fb_config import VERIFICATION_CODE
+from get_callback import *
 
 @app.route('/')
 def index():
@@ -30,8 +30,9 @@ def image():
 @app.route('/webhook', methods=["GET"])
 def fb_webhook():
     verify_token = request.args.get('hub.verify_token')
-    if verification_code == verify_token:
+    if VERIFICATION_CODE == verify_token:
         return request.args.get('hub.challenge')
+    return 'Invalid verification token'
         
 @app.route('/webhook', methods=['POST'])
 def fb_receive_message():
@@ -42,15 +43,15 @@ def fb_receive_message():
             if item.get('message'):
                 message = item['message']
                 if message.get('quick_reply'):
-                    GET.get_quick_reply(user_id,message['quick_reply']['payload'])
+                    get_quick_reply(user_id,message['quick_reply']['payload'])
                 elif message.get('text'):
                     text = message['text']
-                    GET.get_text(user_id,text)
+                    get_text(user_id,text)
                 elif message.get('attachments'):
                     attachments = message['attachments']
                     for att in attachments :
                         if att['type'] == "location":
-                            GET.get_location(user_id,att['payload']['coordinates'])
+                            get_location(user_id,att['payload']['coordinates'])
     return "Hi"
     
 if __name__ == '__main__':

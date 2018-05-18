@@ -1,20 +1,20 @@
 import json
-from pymessager.message import Messager
-from pymessager.message import QuickReply
-from pymessager.message import ContentType
+from fb_api.pymessager.message import Messager
+from fb_api.pymessager.message import QuickReply
+from fb_api.pymessager.message import ContentType
 import random
 
-from fb_api_config import facebook_access_token 
+from fb_config import ACCESS_TOKEN 
 mapping = {"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
 
 def query_location(user_id):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     text = "請告訴我您的地點"
     reply_list = [QuickReply(content_type=ContentType.LOCATION)]
     client.send_quick_replies(user_id, text, reply_list)
 
 def query_subscription_location(user_id):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     text = "請告訴我您想訂閱的地點"
     reply_list = [QuickReply(content_type=ContentType.LOCATION)]
     button = QuickReply("取消", "SET_DEFAULT")
@@ -22,14 +22,14 @@ def query_subscription_location(user_id):
     client.send_quick_replies(user_id, text, reply_list)
 
 def send_text(user_id, text):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     client.send_text(user_id, text)
 
 def hello_to_new_user(user_id):
     text = "歡迎使用台灣生活品質小幫手\
             可以詢問我關於天氣或空氣品質等等的問題喔^^\
             "
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     client.send_text(user_id, text)
     
 def say_something(user_id):
@@ -42,18 +42,18 @@ def say_something(user_id):
         ]
     num = random.randint(0,len(text_list))
     text = "我還小聽不懂> <  " + text_list[num]
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     client.send_text(user_id, text)
     
 def send_sQA_answer(user_id,answer,button_list):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     if len(button_list) == 0:
         client.send_text(user_id, answer)
     else:
         client.send_quick_replies(user_id, answer, button_list)
         
 def send_subscribe_mess(user_id, TF, tag, space):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     if TF == True:
         if tag in ["WEATHER","RAIN","GOOUT"]:
             text = "已經幫您訂閱"+space+"的"+mapping[tag]+", 將會在每天早上通知喔!"
@@ -102,12 +102,12 @@ def send_unsublist(user_id, subscirbed_list):
         send_button_list(user_id, text, button_list)
 
 def send_cancel(user_id):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     text = "好的,若需要訂閱相關資訊再告訴我[訂閱]喔"
     client.send_text(user_id, text)
     
 def send_button_list(user_id,text,button_list):
-    client = Messager(facebook_access_token)
+    client = Messager(ACCESS_TOKEN)
     if len(button_list) == 0:
         client.send_text(user_id, text)
     else:

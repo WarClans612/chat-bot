@@ -1,7 +1,7 @@
 import pymongo
 from pymongo import MongoClient
-from fb_config import *
-from pymessager.message import QuickReply
+from fb_api.fb_config import *
+from fb_api.pymessager.message import QuickReply
 import datetime as DT
 from datetime import datetime
 handle_list = ["WEATHER","RAIN","PM25","GOOUT","UVI"]
