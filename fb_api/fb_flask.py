@@ -3,13 +3,11 @@ import ssl
 import json
 app = Flask(__name__)
 
-from fb_config import VERIFICATION_CODE
-from get_callback import *
+from fb_api.fb_config import VERIFICATION_CODE
+from fb_api.get_callback import *
 
 @app.route('/')
 def index():
-    fw = open('tmp.txt','w')
-    fw.close()
     return "<p>Hello World!</p>"
     
 @app.route('/privacypolicy')
@@ -22,10 +20,6 @@ def privacy():
             <p>      決不在違反使用者意願情況下主動傳訊息</p>\
             "
     return text
-    
-@app.route('/image')
-def image():
-    return render_template('image.html')
     
 @app.route('/webhook', methods=["GET"])
 def fb_webhook():
@@ -53,9 +47,3 @@ def fb_receive_message():
                         if att['type'] == "location":
                             get_location(user_id,att['payload']['coordinates'])
     return "Hi"
-    
-if __name__ == '__main__':
-    ssl_ctx = ssl.SSLContext(ssl.PROTOCOL_SSLv23)
-    ssl_ctx.load_cert_chain('ssl/certificate.crt', 'ssl/private.key')
-    ssl_ctx.load_verify_locations(cafile='ssl/ca_bundle.crt')
-    app.run(host='0.0.0.0',  port= 443, debug=True, ssl_context=ssl_ctx)
