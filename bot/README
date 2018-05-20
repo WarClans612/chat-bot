@@ -1,0 +1,16 @@
+This bot/ folder is the core of the bot process and calculation
+The variable in bot_config.py deeply maintain behavior of this module.
+
+bot_preprocessing.py is the inital point to be run before starting to use this bot.
+In this code implementation, DB is built from the provided data in data/ and extra_dict/
+The function init_bot_QAset() will be the one to be called for this goals.
+If the source for the DB initialization needed to be changed, then please see bot_config.py
+
+bot_answer_code.py controls the answer that is appropriate for corresponding sensor value.
+The returned code is matched with the QA template from the DB (initialized from data/)
+
+bot_function.py contains the main control of the bot to be used by the other module.
+This module provided needed function to process words and choosing the answer from the DB.
+
+method.py responsible for calculation of the score correspond to each groups of question in DB.
+Calulation method differs between the value of received weighting_method, which can be controlled when called.

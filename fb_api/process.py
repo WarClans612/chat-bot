@@ -1,5 +1,6 @@
 from bot import bot_function
 from bot import method 
+from fb_api.fb_config import weighting_method
 
 def extract_type(type, slots):
     if type == "iQA":
@@ -72,7 +73,6 @@ def QAlocation(question,location):
     return type, question_num, answer, slots
 
 def old_QAlocation(question,location):
-    weighting_method = 'fre_prob'
     question_word = bot_function.segment(question)
     location_word = bot_function.segment(location)
     question_word.extend(location_word)
@@ -83,7 +83,6 @@ def old_QAlocation(question,location):
     return answer
     
 def old_QA(question):
-    weighting_method = 'fre_prob'
     question_word = bot_function.segment(question)
     scores_sorted = method.get_score(question_word, weighting_method)
     slots, rest_words = bot_function.get_slots(question_word)

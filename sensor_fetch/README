@@ -1,0 +1,11 @@
+The sensor_fetch/ folder contain module to fetch data from the sensor.
+Most data used is collected from http://opendata2.epa.gov.tw.
+For more detailed understanding of how the data is received, it can be checked from the URL itself.
+
+util.py contains most of the important module to process the command needed for the other module.
+
+Each weather correspond module (pm25.py, rainfall.py, station.py, uvi.py, weather.py)
+uses module in util to simplify the process of fetching, parsing, and processing into or out of DB.
+
+sky.py and sensor_highest_value,py has more special function to gather the data from database.
+This two modules does not directly correspond to a specific weather type but is still used for the bot.

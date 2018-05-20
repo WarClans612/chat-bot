@@ -1,0 +1,12 @@
+This tests/ folder contains test to try that most parts of the component works as wanted.
+
+Each module contains simple unittest check for each of the component:
+    sensor_fetch
+    bot
+    fb_api
+    
+Test for bot is not done for all of the function separately due to many dependency between functions.
+
+To run individual check towards each component, run the following command:
+    python3 tests/<test-module>
+        <test-module> : change into the respective python file being used

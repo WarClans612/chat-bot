@@ -1,0 +1,26 @@
+This fb_api/ folder is used as the bridge for communication with FB.
+The variable in fb_config deeply maintain the behavior for this parts.
+
+The folder 'pymessager' is an open source module to connect to FB API.
+This module originated from 'https://github.com/enginebai/PyMessager'
+If FB API change it format or requirements for message handling, then
+this parts are the one responsible for the change.
+
+The file fb_flask.py contains simple Flask program to process message from FB API.
+Using the webhook to differentiate the request, then the get_callback.py will handle the rest
+
+get_callback.py will call respective function for the needed response.
+By utilizing send_request.py, the send and receive of message is simplified
+
+external_api.py responsible to convert respective coordinate into its respective name.
+Returned value will be the two best possibility answer for the input.
+
+mongodb.py control mostly the DB interaction needed by the API.
+Most used table is the one connected to the user info and the subscription info.
+
+process.py responsible to process the input text and calculating the appropriate answer.
+In this module, 'bot' module will be used to differentiate 'bot' related question.
+Before passing the argument to the 'bot', some preprocess happens here.
+
+send_request.py further wrapped 'pyMessager' module to maintain default answer for some condition.
+The action that is directly related to the FB interface is maintained in this module.
