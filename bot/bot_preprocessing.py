@@ -6,7 +6,7 @@ from pymongo import MongoClient
 import math
 import json
 from bot import bot_config
-from bot import util
+from bot.util import BotUtil
 
 topK = 20
 withWeight = False
@@ -178,7 +178,8 @@ def init_bot_QAset():
             return False
     
     ###connect to DB:"bot"
-    db = util.connect_to_database()
+    client = BotUtil()
+    db = client._bot_db
     
     ### drop all tables to reset
     db.drop_collection('question_table')

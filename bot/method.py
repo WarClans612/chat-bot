@@ -3,7 +3,7 @@
 import operator
 from pymongo import MongoClient
 from bot import bot_config
-from bot import util
+from bot.util import BotUtil
 
 def get_score(q_keywords, weighting_method):
     '''
@@ -17,7 +17,8 @@ def get_score(q_keywords, weighting_method):
         return None
 
     #Start by connecting to database
-    db = util.connect_to_database()
+    client = BotUtil()
+    db = client._bot_db
 
     #Explicit decalaration of needed dictionary
     scores = {}
@@ -152,7 +153,8 @@ def integrateQA(q_keywords):
     '''
     
     #Start by connecting to database
-    db = util.connect_to_database()
+    client = BotUtil()
+    db = client._bot_db
     
     scores_fre_general = {}
     scores_fre_sensor = {}
