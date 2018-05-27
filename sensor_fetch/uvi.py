@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sensor_fetch.util import grab_raw_data_from_url
-from sensor_fetch.util import save_data_into_db
 from sensor_fetch.util import SensorParam
-from sensor_fetch.util import get_data
+from sensor_fetch.util import SensorUtil
 
 def parse_json_data(raw_data):
     uvi_data = []
@@ -42,7 +40,8 @@ def fetch():
             ...
         ]
     """
-    raw_data = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
+    client = SensorUtil()
+    raw_data = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
     uvi_data = parse_json_data(raw_data)
     return uvi_data
 
@@ -51,7 +50,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    return save_data_into_db(data, "uvi_data")
+    client = SensorUtil()
+    return client.save_data_into_db(data, "uvi_data")
 
 def get(name):
     """
@@ -66,4 +66,5 @@ def get(name):
         UVI value in this hour, ``None`` when the name can't be recongnized.`
     """
     sensor_param = SensorParam(name, 'uvi_data', 'UVI', fetch, save)
-    return get_data(sensor_param)
+    client = SensorUtil()
+    return client.get_data(sensor_param)

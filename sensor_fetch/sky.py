@@ -5,7 +5,7 @@ import datetime as DT
 from datetime import datetime
 import pymongo
 from pymongo import MongoClient
-from sensor_fetch import util
+from sensor_fetch.util import SensorUtil
 
 rainbow_list = ["晴午後短暫陣雨","晴午後短暫雷陣雨"]
 sunlist = ["晴午後短暫陣雨","晴午後短暫雷陣雨","晴天","晴時多雲"]
@@ -34,7 +34,8 @@ def location_of_sky_condition(types, slots = None):
         types --> rainbow, sunrise
         if types == sunrise, then slots don't have to be given as argument
     '''
-    db = util.connect_to_database()
+    client = SensorUtil()
+    db = client._sensor_db
     collect = db["weather_data"]
     
     wanted_list = None
@@ -70,7 +71,8 @@ def on_sky(types, slots):
         types --> rainbow, sunrise
         if types == sunrise, then slots don't have to be given as argument
     '''
-    db = util.connect_to_database()
+    client = SensorUtil()
+    db = client._sensor_db
     collect = db["weather_data"]
     
     Location_name = slots["space"]

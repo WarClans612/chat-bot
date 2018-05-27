@@ -3,11 +3,12 @@ import os
 from datetime import datetime
 import pymongo
 from pymongo import MongoClient
-from sensor_fetch import util
+from sensor_fetch.util import SensorUtil
 
 def sensor_highest_value(handle_code,HL):
     table_mapping = {"PM25": "pm25_data","temperature": "weather_data", "UVI": "uvi_data", "RAINFALL": "rainfall_data"}
-    db = util.connect_to_database()
+    client = SensorUtil()
+    db = client._sensor_db
     collect = db[table_mapping[handle_code]]
     
     #Initializing return dict

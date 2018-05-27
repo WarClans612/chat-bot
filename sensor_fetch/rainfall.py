@@ -1,14 +1,12 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sensor_fetch.util import grab_raw_data_from_url
-from sensor_fetch.util import save_data_into_db
 from sensor_fetch.util import SensorParam
-from sensor_fetch.util import get_data
+from sensor_fetch.util import SensorUtil
 
 def parse_json_data(raw_data):
     rainfall_data = []
     for item in raw_data:
-        data = dict()
+        data = {}
         data['County'] = item['County']
         data['rainfall1hr'] = float(item['Rainfall1hr'])
         data['rainfall3hr'] = float(item['Rainfall3hr'])
@@ -41,7 +39,8 @@ def fetch():
             ...
         ]
     """
-    raw_data = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/RainTenMin/?format=json')
+    client = SensorUtil()
+    raw_data = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/RainTenMin/?format=json')
     rainfall_data = parse_json_data(raw_data)
     return rainfall_data
 
@@ -50,7 +49,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    return save_data_into_db(data, 'rainfall_data')
+    client = SensorUtil()
+    return client.save_data_into_db(data, 'rainfall_data')
 
 def get(name, hours=1):
     """
@@ -75,4 +75,5 @@ def get(name, hours=1):
     else:
         item_name = 'rainfall' + str(hours) + 'hr'
         sensor_param = SensorParam(name, 'rainfall_data', item_name, fetch, save)
-        return get_data(sensor_param)
+        client = SensorUtil()
+        return client.get_data(sensor_param)

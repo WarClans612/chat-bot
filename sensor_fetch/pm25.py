@@ -1,9 +1,7 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sensor_fetch.util import grab_raw_data_from_url
-from sensor_fetch.util import save_data_into_db
 from sensor_fetch.util import SensorParam
-from sensor_fetch.util import get_data
+from sensor_fetch.util import SensorUtil
 
 def parse_json_data(raw_data):
     pm25_data = []
@@ -36,7 +34,8 @@ def fetch():
             ...
         ]
     """
-    raw_data = grab_raw_data_from_url('http://opendata2.epa.gov.tw/AQI.json')
+    client = SensorUtil()
+    raw_data = client.grab_raw_data_from_url('http://opendata2.epa.gov.tw/AQI.json')
     pm25_data = parse_json_data(raw_data)
     return pm25_data
 
@@ -45,7 +44,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    return save_data_into_db(data, "pm25_data")
+    client = SensorUtil()
+    return client.save_data_into_db(data, "pm25_data")
 
 def get(name):
     """
@@ -58,4 +58,5 @@ def get(name):
 
     """
     sensor_param = SensorParam(name, 'pm25_data', 'PM25', fetch, save)
-    return get_data(sensor_param)
+    client = SensorUtil()
+    return client.get_data(sensor_param)

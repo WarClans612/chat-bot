@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from datetime import datetime
-from sensor_fetch.util import grab_raw_data_from_url
-from sensor_fetch.util import save_data_into_db
+from sensor_fetch.util import SensorUtil
 
 def parse_json_data(raw_data):
     pm25_station_data = []
@@ -56,9 +55,10 @@ def fetch():
                 ]
             }
     """
+    client = SensorUtil()
     raw_data = {}
-    raw_data["pm25"] = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/AQXSite/?$format=json')
-    raw_data["uvi"] = grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
+    raw_data["pm25"] = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/AQXSite/?$format=json')
+    raw_data["uvi"] = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
     station = parse_json_data(raw_data)
     return station
 
@@ -67,8 +67,9 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
-    pm25_status = save_data_into_db(data['pm25'], 'pm25_station_data')
-    uvi_status = save_data_into_db(data['uvi'], 'uvi_station_data')
+    client = SensorUtil()
+    pm25_status = client.save_data_into_db(data['pm25'], 'pm25_station_data')
+    uvi_status = client.save_data_into_db(data['uvi'], 'uvi_station_data')
     if pm25_status and uvi_status:
         return True
     else:
