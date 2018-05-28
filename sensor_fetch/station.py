@@ -59,6 +59,8 @@ def fetch():
     raw_data = {}
     raw_data["pm25"] = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/AQXSite/?$format=json')
     raw_data["uvi"] = client.grab_raw_data_from_url('http://opendata.epa.gov.tw/ws/Data/UV/?$format=json')
+    if raw_data["pm25"] is None or raw_data["uvi"] is None:
+        return None
     station = parse_json_data(raw_data)
     return station
 
@@ -67,6 +69,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
+    if data is None:
+        return False
     client = SensorUtil()
     pm25_status = client.save_data_into_db(data['pm25'], 'pm25_station_data')
     uvi_status = client.save_data_into_db(data['uvi'], 'uvi_station_data')

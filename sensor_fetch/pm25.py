@@ -36,6 +36,8 @@ def fetch():
     """
     client = SensorUtil()
     raw_data = client.grab_raw_data_from_url('http://opendata2.epa.gov.tw/AQI.json')
+    if raw_data is None:
+        return None
     pm25_data = parse_json_data(raw_data)
     return pm25_data
 
@@ -44,6 +46,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
+    if data is None:
+        return None
     client = SensorUtil()
     return client.save_data_into_db(data, "pm25_data")
 

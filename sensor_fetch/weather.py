@@ -13,9 +13,12 @@ def grab_raw_data():
     request = urllib.request.Request(url)
 
     request.add_header( 'Authorization' , sensor_config.weather_token)
-    with urllib.request.urlopen(request) as response:
-        raw_data = json.loads(response.read().decode('utf-8'))
-    return raw_data
+    try:
+        with urllib.request.urlopen(request, timeout = 10) as response:
+            raw_data = json.loads(response.read().decode('utf-8'))
+        return raw_data
+    except:
+        return None
 
 def parse_json_data(raw_data):
     locations = raw_data['records']['location']
@@ -66,6 +69,8 @@ def fetch():
             ]
     """
     raw_data = grab_raw_data()
+    if raw_data is None:
+        return None
     weather_data = parse_json_data(raw_data)
     return weather_data
 
@@ -74,6 +79,8 @@ def save(data):
     This function should store the input data into database
     Return true when data is stored successfully
     """
+    if data is None:
+        return False
     client = SensorUtil()
     return client.save_weather_to_db(data)
 

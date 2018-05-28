@@ -32,9 +32,12 @@ class SensorUtil:
     _sensor_db = _connect_to_database()
     
     def grab_raw_data_from_url(self, url):
-        with urllib.request.urlopen(url) as response:
-            raw_data = json.loads(response.read().decode('utf-8'))
-        return raw_data
+        try:
+            with urllib.request.urlopen(url, timeout = 10) as response:
+                raw_data = json.loads(response.read().decode('utf-8'))
+            return raw_data
+        except:
+            return None
     
     def save_data_into_db(self, data, collection_name):
         '''
@@ -45,6 +48,8 @@ class SensorUtil:
             pm25_station_data
             uvi_station_data
         '''
+        if data is None:
+            return False
         db = self._sensor_db
         collection_need_renew = ['pm25_station_data', 'uvi_station_data']
         if collection_name in collection_need_renew:
@@ -107,8 +112,9 @@ class SensorUtil:
         if item is None or item[item_name] == 'ND':
             fetch_data = sensor_param.fetch()
             sensor_param.save(fetch_data)
-            time = fetch_data[0]['PublishTime']
-            item = collect.find_one({'$and': [{'PublishTime': {'$eq': time}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
+            if fetch_data is not None:
+                time = fetch_data[0]['PublishTime']
+                item = collect.find_one({'$and': [{'PublishTime': {'$eq': time}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
         #Change the time to the last hour and re search DB
         if item is None or item[item_name] == 'ND':
             before_hour = now_hour - DT.timedelta(hours=1)
