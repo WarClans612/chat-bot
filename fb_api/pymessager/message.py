@@ -102,7 +102,7 @@ class GenericElement:
 
 
 class QuickReply:
-    def __init__(self, title, payload,
+    def __init__(self, title=None, payload=None,
                  image_url=None,
                  content_type=ContentType.TEXT):
         self.title = title

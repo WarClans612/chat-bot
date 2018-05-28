@@ -35,7 +35,7 @@ class MongoDB:
                     "question_num": init_question,
                     "subscription" : {}
                 }
-            collect.insert_one(data)
+            self._fb_db[USER_INFO].insert_one(data)
             return True
         else:
             return False
