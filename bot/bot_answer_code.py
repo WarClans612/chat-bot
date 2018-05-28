@@ -103,11 +103,12 @@ def get_pm25_answer_code(slots):
 def get_goout_answer_code(slots):
     value1 = get_air_quality(slots)
     value2 = get_weather(slots)
-    if value1 is None or value2 is None:
+    value3 = get_uvi(slots)
+    if value1 is None or value2 is None or value3 is None:
         return 0, 0, 0, 0, 0
     air_quality = value1
     temperature, rainfull_prob = value2
-    uvi = get_uvi(slots)
+    uvi = value3
     if uvi < uvi_bound[1]:
         if air_quality < air_quality_bound[1]:
             if rainfull_prob < rain_bound[0]:
