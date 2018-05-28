@@ -33,7 +33,7 @@ class SensorUtil:
     
     def grab_raw_data_from_url(self, url):
         try:
-            with urllib.request.urlopen(url, timeout = 10) as response:
+            with urllib.request.urlopen(url) as response:
                 raw_data = json.loads(response.read().decode('utf-8'))
             return raw_data
         except:

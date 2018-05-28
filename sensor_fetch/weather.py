@@ -14,7 +14,7 @@ def grab_raw_data():
 
     request.add_header( 'Authorization' , sensor_config.weather_token)
     try:
-        with urllib.request.urlopen(request, timeout = 10) as response:
+        with urllib.request.urlopen(request) as response:
             raw_data = json.loads(response.read().decode('utf-8'))
         return raw_data
     except:
