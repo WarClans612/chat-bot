@@ -48,3 +48,6 @@ def fb_receive_message():
                         if att['type'] == "location":
                             get_location(user_id,att['payload']['coordinates'])
     return "Hi"
+
+if __name__ == "__main__":
+    app.run()
