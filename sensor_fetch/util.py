@@ -32,6 +32,7 @@ class SensorUtil:
     _sensor_db = _connect_to_database()
     
     def grab_raw_data_from_url(self, url):
+        return None
         try:
             with urllib.request.urlopen(url) as response:
                 raw_data = json.loads(response.read().decode('utf-8'))
@@ -117,7 +118,7 @@ class SensorUtil:
                 item = collect.find_one({'$and': [{'PublishTime': {'$eq': time}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
         #Change the time to the last hour and re search DB
         if item is None or item[item_name] == 'ND':
-            before_hour = now_hour - DT.timedelta(hours=1)
+            before_hour = now_hour - DT.timedelta(hours=3)
             item = collect.find_one({'$and': [{'PublishTime': {'$gt': before_hour}}, {'$or': [{'County': {'$eq': location_name}},{'SiteName': {'$eq': location_name}}]} ]})
         #Change the time to the last day and re search DB
         if item is None or item[item_name] == 'ND':

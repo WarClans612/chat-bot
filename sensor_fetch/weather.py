@@ -8,6 +8,7 @@ from sensor_fetch.util import SensorParam
 from sensor_fetch.util import SensorUtil
 
 def grab_raw_data():
+    return None
     Data_set = "F-C0032-001"
     url = 'http://opendata.cwb.gov.tw/api/v1/rest/datastore/{Data_set}?sort=time'.format(Data_set=Data_set)
     request = urllib.request.Request(url)
