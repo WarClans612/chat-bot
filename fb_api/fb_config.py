@@ -1,8 +1,9 @@
-from bot import bot_config
+import os
+import config
 
-MONGO_HOST = bot_config.db_url
-MONGO_PORT = 27017
-MONGO_DBNAME = bot_config.db_name
+MONGO_HOST = config.URL
+MONGO_PORT = config.PORT
+MONGO_DBNAME = config.DB_NAME
 USER_INFO = 'user_information'
 weighting_method = 'fre_prob'
 
@@ -12,6 +13,6 @@ weighting_method = 'fre_prob'
     Usually this data is not shared publicly.
     Therefore, the value should be changed first before usage
 '''
-VERIFICATION_CODE = 'unknown'
-ACCESS_TOKEN = 'unknown'
-Google_Maps_Geocoding_API_key = 'unknown'
+VERIFICATION_CODE = os.environ['VERIFICATION_CODE']
+ACCESS_TOKEN = os.environ['ACCESS_TOKEN']
+Google_Maps_Geocoding_API_key = os.environ['Google_Maps_Geocoding_API_key']

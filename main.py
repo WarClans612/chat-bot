@@ -1,5 +1,5 @@
 from bot import bot_preprocessing
-from fb_api import fb_flask
+from fb_api.fb_flask import *
 
 if __name__ == "__main__":
     '''
@@ -13,6 +13,6 @@ if __name__ == "__main__":
         Run flask to start the FB chat service
         Code implementation exists in fb_api/ folder
     '''
-    fb_flask.app.run(host='0.0.0.0', port=5000)
+    app.run()
     
     

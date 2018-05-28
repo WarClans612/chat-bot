@@ -2,9 +2,9 @@ import json
 from fb_api.pymessager.message import Messager
 from fb_api.pymessager.message import QuickReply
 from fb_api.pymessager.message import ContentType
+from fb_api.fb_config import ACCESS_TOKEN
 import random
-
-from fb_config import ACCESS_TOKEN 
+ 
 mapping = {"WEATHER": "天氣" , "RAIN": "降雨" , "PM25": "PM2.5" ,"GOOUT": "戶外資訊" ,"UVI": "紫外線指數"}
 
 def query_location(user_id):
@@ -40,7 +40,7 @@ def say_something(user_id):
         "快來跟我訂閱資訊,讓你出門不煩惱",
         "有什麼建議可以在粉專上面留言給我媽咪唷~",
         ]
-    num = random.randint(0,len(text_list))
+    num = random.randint(0,len(text_list)-1)
     text = "我還小聽不懂> <  " + text_list[num]
     client = Messager(ACCESS_TOKEN)
     client.send_text(user_id, text)

@@ -14,7 +14,7 @@ class FBApiTest(unittest.TestCase):
         location = {}
         location['lat'] = 25.0339639
         location['long'] = 121.5644722
-        assertIsNotEqual(get_area(location), ("不知道",""))
+        self.assertNotEqual(get_area(location), ("不知道",""))
         
 if __name__ == "__main__":
     unittest.main()
