@@ -6,6 +6,8 @@ from bot.bot_answer_code import *
 from sensor_fetch import sensor_highest_value
 from sensor_fetch import sky
 
+default_message = "找不到符合的答案"
+
 def _connect_to_database():
     db_url = bot_config.db_url 
     db_name = bot_config.db_name
@@ -46,7 +48,7 @@ class BotUtil:
             return default_message
             
         if answer_code == 0:
-            return '0'
+            return '資料 Sensor 不反應'
     
         collect = self._bot_db['handle_table']
         A_template = collect.find_one({'handle_code':handle_code, 'answer_code':answer_code })['A_template']
